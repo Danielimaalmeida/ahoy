@@ -1,0 +1,44 @@
+# Machine-readable projection of knowledge/process/delivery-phases.md.
+# bin/tick.sh reads ONLY this file. The prose doc stays authoritative for humans
+# and for what each actor does; this decides routing. Keep them in sync.
+#
+# The "(no state file yet)" row is deliberately absent: creating state.json from
+# the template after validating the Jira key is bin/start.sh's job, and the
+# router has nothing to route until a phase exists. tick.sh runs preflight.sh
+# itself before any phase, which is the other half of that row.
+#
+# kind:
+#   auto           run gate once for the story
+#   implementation child_ready.sh per repo; when ALL pass, pr.sh; then advance
+#   human          advance only when human_gate_key is approved in state.json
+#   terminal       stop
+#
+# on_fail (gate exit 1): a phase name, or `stay` to remain and be re-run later.
+# on_branch (gate exit 3): a phase name, or `-` if the gate cannot branch.
+# log: decision_log entry type to append, or `-` for none. Routine passing
+#      transitions are NOT logged - phase history plus gate_results already
+#      reconstruct those (delivery-phases.md, Notes).
+#
+# interactive: `yes` means the actor gets this terminal. tick.sh runs it WITHOUT
+#      --no-ask-user and without capturing output, so the agent can ask the
+#      human questions and the human can answer. `no` means the actor runs
+#      unattended, where an unanswerable question becomes a silent denial.
+#      Only agent actors can be interactive; a bin/ actor owns its own I/O.
+#
+# on_fail for `planning` is `stay`, not `blocked`. An interactive planning
+# session that ends without a plan is UNFINISHED, not failed — the human closed
+# the terminal, or the agent ran out of turns mid-question. Routing that to a
+# terminal phase throws away a session you can simply resume, and `blocked`
+# needs a hand-edit to leave. Staying in `planning` means re-running the same
+# command picks up where you were.
+#
+# phase	kind	actor	gate	on_pass	on_branch	on_fail	human_gate_key	log	interactive
+intake	auto	navigator	intake.sh	planning	-	blocked	-	blocked	no
+planning	auto	cartographer	plan.sh	plan_review	-	stay	-	-	yes
+plan_review	human	-	-	implementation	-	-	plan_accepted	human_approval	no
+implementation	implementation	bin/dispatch.sh	child_ready.sh	pr_review	implementation	stay	-	-	no
+pr_review	auto	bin/review.sh	consensus.sh	delivery_gate	rework	stay	-	-	no
+rework	auto	-	-	implementation	-	-	-	-	no
+delivery_gate	human	-	-	done	-	-	delivery_accepted	human_approval	no
+done	terminal	-	-	-	-	-	-	-	no
+blocked	terminal	-	-	-	-	-	-	-	no

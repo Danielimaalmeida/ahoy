@@ -1,0 +1,92 @@
+{
+  "story_id": "R3DA-1234",
+  "jira_url": "https://jira.example.com/browse/R3DA-1234",
+  "phase": "pr_review",
+  "plan_path": "specs/R3DA-1234/implementation-plan.md",
+  "rework_ceiling": 3,
+  "navigator": {
+    "completeness": "FULL",
+    "sources": [
+      "jira:R3DA-1234",
+      "confluence:12345"
+    ],
+    "open_questions": []
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "text": "An expired idempotency key is rejected with 409",
+      "source_quote": "Expired keys should get a 409 with code IDEMPOTENCY_KEY_EXPIRED.",
+      "status": "implemented",
+      "repo": "frontend",
+      "test_ids": [
+        "AC1: rejects an expired idempotency key"
+      ]
+    }
+  ],
+  "child_repos": [
+    {
+      "repo": "frontend",
+      "slug": "<your-org>/r3da_niooo_frontend",
+      "session_ref": "sess_01",
+      "branch": "feature/R3DA-1234-idempotency-expiry",
+      "head_sha": "9f2c1ab77e0d",
+      "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/42",
+      "pr_number": 42,
+      "status": "ready",
+      "evidence": {
+        "e2e_evidence": "orders.spec.ts, AC1 exercised, pass"
+      },
+      "rework_ceiling": null,
+      "retry_count": 0
+    }
+  ],
+  "lookout_reviews": [
+    {
+      "model": "gpt-5.6-terra",
+      "lens": "correctness-architecture",
+      "reviewed_shas": {
+        "frontend": "9f2c1ab77e0d"
+      },
+      "criteria_verdicts": {
+        "AC1": "met"
+      },
+      "consensus_status": "CONSENSUS_READY",
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true
+    },
+    {
+      "model": "claude-sonnet-5",
+      "lens": "adversarial-risk",
+      "reviewed_shas": {
+        "frontend": "9f2c1ab77e0d"
+      },
+      "criteria_verdicts": {
+        "AC1": "met"
+      },
+      "consensus_status": "CONSENSUS_READY",
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true
+    }
+  ],
+  "gate_results": [
+    {
+      "gate": "plan.sh",
+      "subject": "R3DA-1234",
+      "result": "pass",
+      "timestamp": "2026-08-19T09:12:00Z",
+      "detail": ""
+    }
+  ],
+  "decision_log": [],
+  "human_gates": {
+    "plan_accepted": {
+      "status": "approved",
+      "timestamp": "2026-08-19T09:20:00Z"
+    },
+    "delivery_accepted": {
+      "status": "pending",
+      "timestamp": null
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "work_package_id": "WP1",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13673-numeric-instance-order",
+  "head_sha": "44ce8e1f63db2c810037cd67b33919a0ebd3e0f2",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.ts now compares repeating instance labels with matching base names by numeric # suffix (asc/desc) before alphabetical fallback; covered by the three AC1 tests in src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts."
+  },
+  "test_ids_delivered": {
+    "sorts repeating instances with matching base name in ascending numerical order (#2 before #10)": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+    "sorts repeating instances with matching base name in descending numerical order (#10 before #2)": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+    "falls back to alphabetical order when base names do not match up to the # character": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts"
+  },
+  "changed_files": [
+    "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+    "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.ts"
+  ],
+  "validation_commands": [
+    {
+      "command": "rtk npm run lint",
+      "result": "pass"
+    },
+    {
+      "command": "rtk npm run test",
+      "result": "pass (1344 passed)"
+    },
+    {
+      "command": "rtk gh run watch 43915078 --exit-status",
+      "result": "pass (unit tests, playwright tests, SonarQube Analysis/lint)"
+    }
+  ],
+  "remaining_gaps": [],
+  "rework_note": "Reopened WP1 fixed: SonarQube lint failure typescript:S6594 in compareInstanceNumbers by replacing String.match with RegExp.exec.",
+  "assumption_check": "No unresolved assumptions remain.",
+  "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/405",
+  "pr_number": 405
+}

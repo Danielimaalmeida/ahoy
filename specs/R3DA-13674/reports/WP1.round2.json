@@ -1,0 +1,49 @@
+{
+  "work_package_id": "WP1",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13674-combined-view-tree-vertical-resize",
+  "head_sha": "86054baf3fb261680e2a2be63df0e3e367fe4831",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "Added/retained the vertical tree separator in combined-structure.component.html and updated combined-structure.component.ts to keep keyboard + drag resizing behavior while now exposing live separator ARIA values. Proven by Playwright tests \"resizes tree panel height via vertical drag handle\" and \"resizes tree panel height via keyboard arrow keys on the separator\" in playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts, plus unit assertions in combined-structure.component.spec.ts.",
+    "AC2": "Vertical drag uses the same shared adjacent-panel drag-to-resize flow in combined-structure.component.ts (orientation-aware resizePanelsByOffset path). E2E proof is \"drag handle updates electrical and mechanical tree heights independently\" in playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts.",
+    "AC3": "Minimum-height clamp remains enforced by shared clamp logic in combined-structure.component.ts and is asserted in both unit and E2E. Proven by \"clamps tree panel height at configured minimum during drag\" in src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts and playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts."
+  },
+  "test_ids_delivered": {
+    "combined-structure-tree-height-resize.e2e.spec.ts": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "resizes tree panel height via keyboard arrow keys on the separator": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "resizes tree panel height via vertical drag handle": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "drag handle updates electrical and mechanical tree heights independently": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "clamps tree panel height at configured minimum during drag": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts; playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts"
+  },
+  "changed_files": [
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.html",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts",
+    "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts"
+  ],
+  "validation_commands": [
+    {
+      "command": "rtk npm run test -- --include src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts",
+      "result": "passed (35 tests)"
+    },
+    {
+      "command": "rtk npm run playwright -- playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+      "result": "passed (4 tests)"
+    },
+    {
+      "command": "rtk npx eslint src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts src/app/features/facility/components/containers/combined-structure/combined-structure.component.html src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+      "result": "passed (no issues)"
+    },
+    {
+      "command": "rtk npx prettier --check src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts src/app/features/facility/components/containers/combined-structure/combined-structure.component.html src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+      "result": "passed"
+    }
+  ],
+  "remaining_gaps": [],
+  "rework_note": "Fixed the reopened high-severity accessibility defect by adding aria-valuenow and aria-valuemax to the vertical tree separator and updating these values during drag/keyboard resize so assistive tech receives split-position feedback.",
+  "assumption_check": "No unresolved assumptions remain.",
+  "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/401",
+  "pr_number": 401
+}

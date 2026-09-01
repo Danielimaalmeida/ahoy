@@ -1,0 +1,48 @@
+{
+  "work_package_id": "WP2",
+  "repo": "backend",
+  "repo_slug": "qwerty/r3da_cdm_backend",
+  "branch": "feature/R3DA-13709-sas-attributes-eplan",
+  "head_sha": "226577bb194758cc96b532fb894e3cb29c979d44",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "POST /v2/electrical-structures/{masterString}/eplan persists SAS attributes for non-ARTICLE nodes end to end; verified by ElectricalStructureResourceIT.uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren using sas_v8_attributes.json and follow-up reads.",
+    "AC2": "SASPartMapper stores dto.attributes entries in the generic node attributes property and preserves hierarchy; proven by SASPartMapperTest.toElectricalPartMapsAttributesAsNodePropertiesForNonArticleNodes and SASPartMapperTest.toElectricalPartPreservesChildrenWhenAttributesArePresent, plus endpoint IT coverage in uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren.",
+    "AC3": "Precedence (attributes > articleData > none) is proven by SASPartMapperTest.toElectricalPartPrefersAttributesOverArticleDataWhenBothPresent, SASPartMapperTest.toElectricalPartFallsBackToArticleDataWhenAttributesAbsent (hardened to also prove child preservation in fallback), and SASPartMapperTest.toElectricalPartLeavesNodeUnattributedWhenNeitherPropertyPresent."
+  },
+  "test_ids_delivered": {
+    "uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren": "src/test/java/com/asd/ito/integration/electrical/structure/ElectricalStructureResourceIT.java",
+    "toElectricalPartMapsAttributesAsNodePropertiesForNonArticleNodes": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartPreservesChildrenWhenAttributesArePresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartPrefersAttributesOverArticleDataWhenBothPresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartFallsBackToArticleDataWhenAttributesAbsent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartLeavesNodeUnattributedWhenNeitherPropertyPresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java"
+  },
+  "changed_files": [
+    "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java"
+  ],
+  "validation_commands": [
+    {
+      "command": "./mvnw test",
+      "result": "passed"
+    },
+    {
+      "command": "./mvnw verify -DskipITs=false",
+      "result": "passed"
+    },
+    {
+      "command": "./mvnw checkstyle:check",
+      "result": "passed"
+    }
+  ],
+  "remaining_gaps": [
+    {
+      "severity": "high",
+      "detail": "The reopened rework note references duplicate Angular template refs (#resizer at lines 25/59/81), but this backend repository contains no Angular templates or matching symbols (no resizer/onResizerMouseDown occurrences). The issue appears to belong to a different repository/package and is not actionable in r3da_cdm_backend."
+    }
+  ],
+  "rework_note": "Reopened note handled: hardened mapper fallback-path coverage by updating toElectricalPartFallsBackToArticleDataWhenAttributesAbsent to also assert children are preserved through the articleData branch; searched backend repo for the reported Angular #resizer defect and found no such file/symbol in this codebase.",
+  "assumption_check": "No unresolved assumptions remain.",
+  "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_backend/pull/352",
+  "pr_number": 352
+}

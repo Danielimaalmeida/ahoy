@@ -1,0 +1,55 @@
+{
+  "work_package_id": "WP1",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13674-combined-view-tree-vertical-resize",
+  "head_sha": "08765d30854d6486b32bbc311723467b5325b243",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "Added a dedicated vertical separator handle between electrical and mechanical tree panels in Combined view with keyboard (ArrowUp/ArrowDown) and drag support via shared resize logic. Implemented in src/app/features/facility/components/containers/combined-structure/combined-structure.component.html and .ts, with styling in combined-structure.component.scss. Proven by playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts tests 'resizes tree panel height via keyboard arrow keys on the separator' and 'resizes tree panel height via vertical drag handle'.",
+    "AC2": "Tree viewport height resizing uses the same drag-to-resize interaction pattern as horizontal panel resizing by reusing onResizerMouseDown/startDrag/resizePanelsByOffset with axis switching (data-resize-axis='y'). Implemented in src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts and .html, and exercised by 'drag handle updates electrical and mechanical tree heights independently' in playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts.",
+    "AC3": "Vertical resizing clamps both tree panels to configured minimum height using getMinSize and clamped offset calculations, with min height configured in SCSS (--combined-tree-panel-min-height and min-height on tree panels). Implemented in combined-structure.component.ts and combined-structure.component.scss. Proven by 'clamps tree panel height at configured minimum during drag' in playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts and unit assertion in combined-structure.component.spec.ts."
+  },
+  "test_ids_delivered": {
+    "combined-structure-tree-height-resize.e2e.spec.ts": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "resizes tree panel height via keyboard arrow keys on the separator": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts; src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts",
+    "resizes tree panel height via vertical drag handle": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "drag handle updates electrical and mechanical tree heights independently": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "clamps tree panel height at configured minimum during drag": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts; src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts"
+  },
+  "changed_files": [
+    "playwright/pages/facility-structures.pages.ts",
+    "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.html",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.scss",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts",
+    "src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts"
+  ],
+  "validation_commands": [
+    {
+      "command": "rtk npm run start:keycloak",
+      "result": "PASS (app and mock backend became reachable on localhost:4200 and localhost:3000)"
+    },
+    {
+      "command": "rtk npx ng test --no-watch --no-progress --include src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts",
+      "result": "PASS (34 tests passed)"
+    },
+    {
+      "command": "rtk npx playwright test playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts --project=msedge",
+      "result": "PASS (4 passed, 0 failed)"
+    },
+    {
+      "command": "rtk curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4200; rtk curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000",
+      "result": "PASS (after shutdown both ports returned 000, confirming no lingering processes)"
+    }
+  ],
+  "remaining_gaps": [
+    {
+      "severity": "low",
+      "detail": "Density MCP tools and Playwright browser MCP interaction APIs returned permission-denied in this environment; implementation and evidence rely on repository code plus passing unit/E2E automation."
+    }
+  ],
+  "assumption_check": "No unresolved assumptions remain.",
+  "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/401",
+  "pr_number": 401
+}

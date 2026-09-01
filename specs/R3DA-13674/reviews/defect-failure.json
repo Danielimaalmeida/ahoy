@@ -1,0 +1,26 @@
+{
+  "lens": "defect-failure",
+  "reviewed_shas": {
+    "frontend": "67bd2c09a104565e313045b6db07a52abc2f0872"
+  },
+  "criteria_verdicts": {
+    "AC1": "met",
+    "AC2": "met",
+    "AC3": "met"
+  },
+  "findings": [
+    {
+      "severity": "low",
+      "summary": "treeHeightResizerAriaValues starts at a hardcoded default (min:180, now:180, max:360) and is only recomputed on focus or drag start (onTreeHeightResizerFocus / onResizerMouseDown / startDrag). If a screen-reader user reaches the separator via any path that does not fire a focus event, or if actual rendered panel heights differ from the 2x-min assumption before first interaction, aria-valuenow/aria-valuemax could be briefly inaccurate. No user-visible resize failure results; this is an ARIA-freshness gap, not a broken resize.",
+      "location": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts: treeHeightResizerAriaValues signal initializer; onTreeHeightResizerFocus"
+    },
+    {
+      "severity": "low",
+      "summary": "In the 'should use vertical cursor movement for tree panel height resizers' unit test, left/right getBoundingClientRect mocks only stub width ({width:400}/{width:600} as DOMRect), so the axis='y' code path in onResizerMouseDown reads rect.height as undefined when syncTreeHeightResizerAriaValues runs before the (separately stubbed) startDrag call. This produces NaN aria values silently rather than a test failure; harmless today because the test doesn't assert on aria state, but the mock doesn't reflect real vertical geometry.",
+      "location": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts: describe('onResizerMouseDown') > 'should use vertical cursor movement for tree panel height resizers'"
+    }
+  ],
+  "unresolved_high_or_blocking_count": 0,
+  "diminishing_returns_agreed": true,
+  "consensus_status": "CONSENSUS_READY"
+}

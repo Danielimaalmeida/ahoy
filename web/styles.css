@@ -1,0 +1,382 @@
+/* Ahoy UI - the colour language and spacing of web/mockup.html.
+   Light mode, rounded corners, quiet. A tool, not a dashboard. */
+
+:root {
+  --bg: #faf9f7;
+  --surface: #fff;
+  --line: #e8e5e0;
+  --text: #1c1b19;
+  --text-2: #5c5852;
+  --text-3: #8a857d;
+  --accent: #2563eb;
+  --accent-bg: #eff4ff;
+  --ok: #166534;
+  --ok-bg: #f0fdf4;
+  --warn: #92400e;
+  --warn-bg: #fffbeb;
+  --bad: #991b1b;
+  --bad-bg: #fef2f2;
+  --mute-bg: #f4f2ef;
+  --r: 10px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.wrap { max-width: 1080px; margin: 0 auto; }
+
+.top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.brand { font-weight: 600; letter-spacing: -0.01em; }
+.top-note { font-size: 12px; color: var(--text-3); }
+
+.grid {
+  display: grid; grid-template-columns: 250px 1fr; gap: 16px; align-items: start;
+}
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.pad { padding: 18px 20px; }
+
+/* ------------------------------------------------------------- story list */
+
+.list-head {
+  padding: 11px 15px; border-bottom: 1px solid var(--line);
+  font-size: 12px; color: var(--text-3);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.list-group {
+  padding: 9px 15px 5px; font-size: 11px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--line); background: var(--bg);
+}
+.row {
+  display: block; width: 100%; text-align: left; font: inherit;
+  padding: 11px 15px; border: 0; border-bottom: 1px solid var(--line);
+  background: transparent; cursor: pointer;
+}
+.row:last-child { border-bottom: 0; }
+.row:hover { background: var(--bg); }
+.row.on { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+.row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.key { font-family: var(--mono); font-size: 12.5px; font-weight: 600; }
+.sub { font-size: 12.5px; color: var(--text-2); margin: 2px 0 6px; }
+
+/* -------------------------------------------------------------- fragments */
+
+.badge {
+  display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px;
+  white-space: nowrap;
+}
+.b-warn { background: var(--warn-bg); color: var(--warn); }
+.b-ok   { background: var(--ok-bg);   color: var(--ok); }
+.b-acc  { background: var(--accent-bg); color: var(--accent); }
+.b-bad  { background: var(--bad-bg);  color: var(--bad); }
+.b-mute { background: var(--mute-bg); color: var(--text-3); }
+
+h1 { font-size: 17px; margin: 0; font-weight: 600; }
+h2 { font-size: 13px; margin: 0; font-weight: 600; }
+
+.head-bar {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+}
+a { color: var(--accent); text-decoration: none; font-size: 12.5px; }
+a:hover { text-decoration: underline; }
+
+.mono { font-family: var(--mono); font-size: 11.5px; }
+.muted { color: var(--text-3); }
+.empty { font-size: 12.5px; color: var(--text-3); }
+
+/* --------------------------------------------------------- progress strip */
+
+.strip {
+  display: flex; gap: 5px; flex-wrap: wrap; margin: 16px 0 6px; font-size: 11px;
+  align-items: center;
+}
+.step { padding: 3px 9px; border-radius: 99px; background: var(--mute-bg); color: var(--text-3); }
+.step.done { background: var(--ok-bg); color: var(--ok); }
+.step.now  { background: var(--warn-bg); color: var(--warn); font-weight: 600; }
+.step.fail { background: var(--bad-bg); color: var(--bad); }
+.step.human::before { content: "\25C6\00a0"; opacity: 0.65; }
+.strip-note { font-size: 11px; color: var(--text-3); margin-bottom: 18px; }
+
+/* --------------------------------------------------------------- sections */
+
+.panel {
+  background: var(--bg); border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px;
+}
+.panel.flat { background: transparent; border: 1px solid var(--line); }
+.label {
+  font-size: 12px; color: var(--text-3); margin-bottom: 9px;
+  display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+}
+.note {
+  font-size: 12.5px; color: var(--text-2); margin-top: 11px; padding-top: 11px;
+  border-top: 1px solid var(--line);
+}
+
+.ac { display: flex; gap: 10px; padding: 5px 0; }
+.ac + .ac { border-top: 1px solid var(--line); }
+.ac code { font-family: var(--mono); font-size: 11.5px; color: var(--text-2); padding-top: 2px; }
+.ac-body { flex: 1; min-width: 0; }
+.quote {
+  font-size: 12.5px; color: var(--text-3); margin-top: 3px;
+  border-left: 2px solid var(--line); padding-left: 8px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.chip {
+  font-family: var(--mono); font-size: 11px; padding: 1px 7px; border-radius: 5px;
+  background: var(--mute-bg); color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ table */
+
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th {
+  text-align: left; font-weight: 500; color: var(--text-3); font-size: 11px;
+  padding: 4px 10px 6px 0; border-bottom: 1px solid var(--line);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:last-child, th:last-child { padding-right: 0; }
+
+/* --------------------------------------------------------------- verdicts */
+
+.verdict-row.split { background: var(--warn-bg); }
+.verdict-row.split td { border-bottom-color: #f3e3c3; }
+.split-flag { color: var(--warn); font-size: 11px; white-space: nowrap; }
+.callout {
+  border: 1px solid #f0dcb4; background: var(--warn-bg); border-radius: var(--r);
+  padding: 13px 15px; margin-bottom: 14px;
+}
+.callout h2 { color: var(--warn); margin-bottom: 6px; }
+.callout p { margin: 0; font-size: 12.5px; color: #6b4415; }
+.callout p + p { margin-top: 7px; }
+.callout.agreed { border-color: #f0c4c4; background: var(--bad-bg); }
+.callout.agreed h2 { color: var(--bad); }
+.callout.agreed p { color: #7a2020; }
+
+.finding { padding: 9px 0; }
+.finding + .finding { border-top: 1px solid var(--line); }
+.finding-head { display: flex; gap: 8px; align-items: baseline; }
+.finding p { margin: 4px 0 0; font-size: 12.5px; }
+.finding .rec { color: var(--text-2); }
+
+/* --------------------------------------------------------------- decision */
+
+.decision { border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-bottom: 14px; }
+textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: var(--r);
+  padding: 10px 12px; font: inherit; resize: vertical; background: var(--surface);
+}
+textarea:focus { outline: 2px solid var(--accent-bg); border-color: var(--accent); }
+.btns { display: flex; gap: 8px; margin-top: 11px; flex-wrap: wrap; }
+button {
+  font: inherit; font-size: 13px; padding: 7px 15px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+  color: var(--text);
+}
+button:hover:not(:disabled) { background: var(--bg); }
+button:disabled { opacity: 0.42; cursor: not-allowed; }
+button.primary:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+button.danger:not(:disabled) { border-color: #e5c3c3; color: var(--bad); }
+.fine { font-size: 12px; color: var(--text-3); margin-top: 10px; }
+
+.result { margin-top: 12px; border-radius: var(--r); padding: 11px 13px; font-size: 12.5px; }
+.result.ok   { background: var(--ok-bg); }
+.result.warn { background: var(--warn-bg); }
+.result.bad  { background: var(--bad-bg); }
+.result h2 { font-size: 12.5px; margin-bottom: 5px; }
+.result.ok h2 { color: var(--ok); }
+.result.warn h2 { color: var(--warn); }
+.result.bad h2 { color: var(--bad); }
+.result pre {
+  margin: 7px 0 0; font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
+  white-space: pre-wrap; word-break: break-word; color: var(--text-2);
+}
+.result .cmd { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+/* ------------------------------------------------------------------ chat */
+
+/* The live session is the only thing on the page that is happening now, and it
+   sits above the record of everything that already has. `live` lifts it off the
+   page; `waiting` is the state that wants something from you, so it is louder. */
+.panel.live {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 3px rgba(28, 27, 25, 0.06);
+}
+.panel.live .label { color: var(--text-2); }
+.panel.live.waiting {
+  border-color: #cfdcfb;
+  background: var(--accent-bg);
+}
+.panel.live.waiting .chat-log { border-color: #cfdcfb; }
+
+.chat-status.waiting { color: var(--accent); font-weight: 600; }
+
+.chat-log {
+  min-height: 160px;
+  max-height: 380px;
+  margin: 0 0 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.chat-form { display: flex; gap: 8px; align-items: flex-start; }
+.chat-input {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 9px 12px;
+  font: inherit;
+  resize: vertical;
+  background: var(--surface);
+}
+.chat-input:focus { outline: 2px solid var(--accent-bg); border-color: var(--accent); }
+.chat-input:disabled { background: var(--bg); color: var(--text-3); }
+
+/* ------------------------------------------------------------- documents */
+
+details { border-top: 1px solid var(--line); }
+details summary {
+  cursor: pointer; font-size: 12.5px; color: var(--accent); padding: 10px 0 0;
+  list-style: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: "\25B8\00a0"; display: inline-block; }
+details[open] summary::before { content: "\25BE\00a0"; }
+.doc {
+  margin: 10px 0 4px; max-height: 420px; overflow: auto; background: var(--bg);
+  border-radius: var(--r); padding: 12px 14px;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word; color: var(--text-2);
+}
+
+/* ------------------------------------------------- rendered documents */
+/* The Rendered/Source toggle, and the markdown it switches between. Sizes
+   step down from the page's 14px rather than up: a plan is a document read
+   inside a tool, not the headline of the screen. */
+
+.doc-views { display: flex; gap: 4px; margin: 10px 0 0; }
+.doc-view {
+  font: inherit; font-size: 11.5px; cursor: pointer;
+  padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text-3);
+}
+.doc-view:hover { color: var(--text-2); }
+.doc-view.is-on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+.md {
+  margin: 10px 0 4px; max-height: 420px; overflow: auto;
+  background: var(--bg); border-radius: var(--r); padding: 4px 14px 14px;
+  font-size: 13px; line-height: 1.6; color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.md-h { color: var(--text); line-height: 1.35; margin: 18px 0 8px; font-weight: 600; }
+.md-h:first-child { margin-top: 10px; }
+.md-h[data-level="1"] { font-size: 16px; letter-spacing: -0.01em; }
+.md-h[data-level="2"] {
+  font-size: 14px; padding-bottom: 5px; border-bottom: 1px solid var(--line);
+}
+.md-h[data-level="3"] { font-size: 13px; }
+.md-h[data-level="4"], .md-h[data-level="5"], .md-h[data-level="6"] {
+  font-size: 12.5px; color: var(--text-2);
+}
+
+.md-p { margin: 8px 0; }
+.md-hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+.md-list { margin: 8px 0; padding-left: 20px; }
+.md-item { margin: 3px 0; }
+.md-item::marker { color: var(--text-3); }
+.md-list .md-list { margin: 3px 0; }
+
+.md-quote {
+  margin: 10px 0; padding: 2px 0 2px 12px;
+  border-left: 2px solid var(--line); color: var(--text-3);
+}
+
+.md-inline-code, .md-code {
+  font-family: var(--mono); background: var(--mute-bg); border-radius: 5px;
+}
+.md-inline-code { font-size: 11.5px; padding: 1px 5px; color: var(--text); }
+.md-code {
+  font-size: 11.5px; line-height: 1.6; margin: 10px 0; padding: 10px 12px;
+  overflow-x: auto; white-space: pre; color: var(--text-2);
+}
+.md-code code { font: inherit; background: none; padding: 0; }
+
+/* Tables are the reason this view exists, so they get horizontal scroll of
+   their own instead of stretching the panel. Columns size to their content
+   and only long prose cells wrap, so an identifier like `r3da_niooo_frontend`
+   is not broken across lines to make room for a paragraph next to it. */
+.md-table-wrap { margin: 10px 0; overflow-x: auto; }
+.md-table {
+  border-collapse: collapse; font-size: 12px;
+  width: max-content; min-width: 100%;
+}
+.md-table th, .md-table td {
+  border: 1px solid var(--line); padding: 6px 9px;
+  text-align: left; vertical-align: top; min-width: 90px; max-width: 460px;
+}
+/* The page's bare `th` rule styles list headers as UI labels. A markdown
+   header is content, so it is shown as the author typed it. */
+.md-table th {
+  background: var(--mute-bg); color: var(--text); font-weight: 600;
+  text-transform: none; letter-spacing: normal; font-size: inherit;
+}
+.md-table tbody tr:nth-child(even) td { background: var(--surface); }
+
+.md-link { color: var(--accent); }
+.md-link-blocked { color: var(--text); text-decoration: underline dotted var(--text-3); cursor: help; }
+
+/* --------------------------------------------------------- new story card */
+
+/* Sits above the story list in a 250px column, so the form is stacked rather
+   than laid out in a row, and the script's output is allowed to scroll instead
+   of pushing the list off the screen. */
+.newstory { margin-bottom: 12px; }
+.newstory-body { padding: 11px 13px; }
+.newstory-open { width: 100%; text-align: center; }
+.newstory input {
+  width: 100%; border: 1px solid var(--line); border-radius: var(--r);
+  padding: 8px 10px; font: inherit; font-size: 13px; font-family: var(--mono);
+  background: var(--surface); color: var(--text);
+}
+.newstory input:focus { outline: 2px solid var(--accent-bg); border-color: var(--accent); }
+.newstory input::placeholder { color: var(--text-3); }
+.newstory .btns button { flex: 1; padding: 7px 9px; }
+.newstory .result pre { max-height: 190px; overflow: auto; }
+
+/* Credits ------------------------------------------------------------------
+   Scoped to .credits so it cannot leak into the tables the markdown renderer
+   emits inside .md, which share this panel's ancestor. */
+.credits { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 13px; }
+.credits th {
+  text-align: left; font-weight: 600; color: var(--text-3);
+  padding: 4px 8px 6px 0; border-bottom: 1px solid var(--line);
+}
+.credits td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--line); }
+.credits td.num, .credits th:nth-child(2), .credits th:nth-child(3) { text-align: right; }
+.credits td.num { font-variant-numeric: tabular-nums; }
+.credits tfoot td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--line); }
+.credits th:last-child, .credits td:last-child { width: 34%; padding-right: 0; }
+.cbar {
+  display: block; height: 6px; border-radius: 3px;
+  background: var(--accent-bg); overflow: hidden;
+}
+.cbar-fill { display: block; height: 100%; background: var(--accent); border-radius: 3px; }

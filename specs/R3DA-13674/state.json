@@ -1,0 +1,1895 @@
+{
+  "story_id": "R3DA-13674",
+  "jira_url": "https://atc.asdgroup.net/jira/browse/R3DA-13674",
+  "phase": "implementation",
+  "plan_path": "specs/R3DA-13674/implementation-plan.md",
+  "branch_prefix": "feature",
+  "rework_ceiling": 3,
+  "navigator": {
+    "completeness": "FULL",
+    "sources": [
+      "jira-mcp: key = \"R3DA-13674\""
+    ],
+    "open_questions": []
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "text": "The trees container in the Combined view (electrical and mechanical tree panels) supports adjustable height via a new vertical resize handle, in addition to the existing horizontal resizing.",
+      "source_quote": "Tree structure viewport has adjustable height in Combined view",
+      "status": "planned",
+      "repo": "frontend",
+      "test_ids": [
+        "combined-structure-tree-height-resize.e2e.spec.ts",
+        "resizes tree panel height via keyboard arrow keys on the separator",
+        "resizes tree panel height via vertical drag handle"
+      ]
+    },
+    {
+      "id": "AC2",
+      "text": "Tree structure viewport height is configurable by drag and drop, using the same drag-to-resize interaction pattern already used for the width of the other Combined-view panels.",
+      "source_quote": "Make the height of the tree structure viewports configurable by drag and drop just like the width of other elements already are.",
+      "status": "planned",
+      "repo": "frontend",
+      "test_ids": [
+        "drag handle updates electrical and mechanical tree heights independently",
+        "combined-structure-tree-height-resize.e2e.spec.ts"
+      ]
+    },
+    {
+      "id": "AC3",
+      "text": "Vertical resizing of the tree structure viewports respects a configured minimum height and cannot shrink either panel below it.",
+      "source_quote": "Configurable height of tree structure viewports must respect a minimum height constraint.",
+      "status": "planned",
+      "repo": "frontend",
+      "test_ids": [
+        "clamps tree panel height at configured minimum during drag"
+      ]
+    }
+  ],
+  "work_packages": [
+    {
+      "id": "WP1",
+      "repo": "frontend",
+      "agent": "frontend-implementer",
+      "branch_slug": "combined-view-tree-vertical-resize",
+      "depends_on": [],
+      "open_pr": true,
+      "status": "done",
+      "acceptance_criteria": [
+        "AC1",
+        "AC2",
+        "AC3"
+      ],
+      "rework_note": "Duplicate #resizer template variable causes incorrect element references in event handlers\n\nAll three resizer elements — the new vertical one (inside .main__trees) and the two horizontal ones — share the same #resizer template reference variable within the same @if view scope.\n\nPreviously the horizontal resizers didn't use inline (mousedown) bindings; instead viewChildren('resizer') collected them and ngAfterViewInit attached listeners via Renderer2. That approach worked fine with duplicate names.\n\nNow that all three use inline (mousedown)=\"onResizerMouseDown($event, resizer)\", Angular resolves the resizer identifier against the view's local variable context, which is overwritten each time an element with #resizer is encountered during rendering. This means all three event handlers end up passing the last-declared #resizer element (the second horizontal resizer) as the resizer argument, breaking the getAdjacentPanels lookup for the first two.\n\nGive each resizer a unique template variable name:\n\n<!-- vertical tree-height resizer -->\n<div class=\"resizer resizer--vertical\" #treeHeightResizer ... (mousedown)=\"onResizerMouseDown($event, treeHeightResizer)\"></div>\n\n<!-- horizontal resizers -->\n<div class=\"resizer\" #leftResizer data-resize-axis=\"x\" (mousedown)=\"onResizerMouseDown($event, leftResizer)\"></div>\n<div class=\"resizer\" #rightResizer data-resize-axis=\"x\" (mousedown)=\"onResizerMouseDown($event, rightResizer)\"></div>",
+      "in_progress_rounds": 0
+    },
+    {
+      "id": "WP2",
+      "repo": "frontend",
+      "agent": "a11y-reviewer",
+      "branch_slug": "combined-view-tree-vertical-resize-a11y",
+      "depends_on": [
+        "WP1"
+      ],
+      "open_pr": false,
+      "status": "unverified",
+      "acceptance_criteria": [
+        "AC1",
+        "AC2",
+        "AC3"
+      ],
+      "in_progress_rounds": 0,
+      "rework_note": "Huge bug!! Three elements in the same template scope all declare #resizer (lines 25, 59, 81). Angular template variable names must be unique within a view; duplicate names shadow each other and can cause subtle resolution issues with static analysis tools and future Angular compiler changes. Each separator already has a unique data-testid and CSS modifier — give each a distinct template reference variable instead:\n\n<!-- vertical separator inside .main__trees -->\n#verticalResizer   (mousedown)=\"onResizerMouseDown($event, verticalResizer)\"\n\n<!-- first horizontal separator -->\n#leftResizer       (mousedown)=\"onResizerMouseDown($event, leftResizer)\"\n\n<!-- second horizontal separator -->\n#rightResizer      (mousedown)=\"onResizerMouseDown($event, rightResizer)\""
+    }
+  ],
+  "child_repos": [
+    {
+      "repo": "frontend",
+      "slug": "zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend",
+      "branch": "feature/R3DA-13674-combined-view-tree-vertical-resize",
+      "head_sha": "17c5c79d0da9c3852df595cad3c3bcfb90f894a7",
+      "status": "in_progress",
+      "retry_count": 1,
+      "pr_number": 401,
+      "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/401"
+    }
+  ],
+  "lookout_reviews": [
+    {
+      "lens": "design-fit",
+      "reviewed_shas": {
+        "frontend": "67bd2c09a104565e313045b6db07a52abc2f0872"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "met",
+        "AC3": "met"
+      },
+      "findings": [],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true,
+      "consensus_status": "CONSENSUS_READY",
+      "model": "gpt-5.6-terra"
+    },
+    {
+      "lens": "defect-failure",
+      "reviewed_shas": {
+        "frontend": "67bd2c09a104565e313045b6db07a52abc2f0872"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "met",
+        "AC3": "met"
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "summary": "treeHeightResizerAriaValues starts at a hardcoded default (min:180, now:180, max:360) and is only recomputed on focus or drag start (onTreeHeightResizerFocus / onResizerMouseDown / startDrag). If a screen-reader user reaches the separator via any path that does not fire a focus event, or if actual rendered panel heights differ from the 2x-min assumption before first interaction, aria-valuenow/aria-valuemax could be briefly inaccurate. No user-visible resize failure results; this is an ARIA-freshness gap, not a broken resize.",
+          "location": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.ts: treeHeightResizerAriaValues signal initializer; onTreeHeightResizerFocus"
+        },
+        {
+          "severity": "low",
+          "summary": "In the 'should use vertical cursor movement for tree panel height resizers' unit test, left/right getBoundingClientRect mocks only stub width ({width:400}/{width:600} as DOMRect), so the axis='y' code path in onResizerMouseDown reads rect.height as undefined when syncTreeHeightResizerAriaValues runs before the (separately stubbed) startDrag call. This produces NaN aria values silently rather than a test failure; harmless today because the test doesn't assert on aria state, but the mock doesn't reflect real vertical geometry.",
+          "location": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.spec.ts: describe('onResizerMouseDown') > 'should use vertical cursor movement for tree panel height resizers'"
+        }
+      ],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true,
+      "consensus_status": "CONSENSUS_READY",
+      "model": "claude-sonnet-5"
+    }
+  ],
+  "gate_results": [
+    {
+      "gate": "intake.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "snapshot present with description, 2 acceptance criteria and stated boundaries; Navigator reported FULL",
+      "timestamp": "2026-08-30T11:31:40Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: frontend",
+      "timestamp": "2026-08-30T11:36:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: frontend",
+      "timestamp": "2026-08-30T11:37:02Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: frontend",
+      "timestamp": "2026-08-30T11:47:26Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T12:35:16Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T12:51:24Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T13:02:16Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T13:15:55Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T13:26:05Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T13:36:17Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T13:51:09Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:05:02Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:17:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:17:44Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:18:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:18:45Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:19:16Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:19:46Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:20:17Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:20:48Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:21:18Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:21:49Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:22:19Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:22:50Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:23:20Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:23:51Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:24:21Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:24:52Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:25:23Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:25:53Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:26:24Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:26:54Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:27:25Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:27:56Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:28:26Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:28:57Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:29:28Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:29:58Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:30:29Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:31:00Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:31:31Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:32:01Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:32:32Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:33:03Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:33:33Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:34:04Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:34:35Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:35:05Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:35:36Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:36:06Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:36:37Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:37:08Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:37:38Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:38:09Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:38:40Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:39:10Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:39:41Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:40:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:40:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:41:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:41:43Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:42:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:42:45Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:43:15Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T14:43:46Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:05:04Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:19:46Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:30:10Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:41:08Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:41:38Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:42:09Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:42:40Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:43:10Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:43:41Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:44:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:44:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:45:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:45:43Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:46:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:46:44Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:47:15Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:48:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:52:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:52:44Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:53:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T15:53:51Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:19:57Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' reports ready but no open PR exists for branch 'feature/R3DA-13674-combined-view-tree-vertical-resize-a11y' in zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend",
+      "timestamp": "2026-08-30T16:25:11Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:26:19Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:26:51Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:27:22Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:27:54Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:28:26Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:28:58Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:29:30Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361",
+      "timestamp": "2026-08-30T16:30:01Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "branch",
+      "message": "PR #401 has failing check(s):\n  format / format -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860383/job/139750275\n  SonarQube Analysis / lint -> https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/actions/runs/43860384/job/139750361\nCI is red and will not go green on its own; routing back to implementation",
+      "timestamp": "2026-08-30T16:35:58Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "rework_ceiling.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "repo 'frontend' rework round 1 of 3 allowed",
+      "timestamp": "2026-08-30T16:35:58Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:35:59Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:36:30Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:39:22Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:39:53Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:42:03Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:42:34Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T16:44:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T17:39:18Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:27:41Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:28:11Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:28:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:29:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:29:43Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:30:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:30:45Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:31:16Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:31:46Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:32:17Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:32:49Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:33:19Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:33:50Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:34:21Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:34:51Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:35:22Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:35:53Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:36:23Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:36:54Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:37:25Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:37:55Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:38:26Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:38:56Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:39:27Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:39:58Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:40:28Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:40:59Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:41:29Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:42:00Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:42:31Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:43:01Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:43:32Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:44:03Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:44:33Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:45:04Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:45:35Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:46:05Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:46:36Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:47:06Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:47:37Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:48:08Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:48:38Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:49:09Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:49:40Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:50:10Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:50:41Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:51:12Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:51:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:52:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:52:43Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:53:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:53:45Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:54:15Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:54:46Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:55:17Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:55:47Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:56:18Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:56:49Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:57:19Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:57:50Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T18:58:20Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-30T19:35:15Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "repo 'frontend' ready: PR #401 open at 67bd2c09a104565e313045b6db07a52abc2f0872, 8 check(s) green, 6 planned test(s) present in the diff",
+      "timestamp": "2026-08-30T19:47:38Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "pr.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "all 1 child repositories ready with open pull requests linked to R3DA-13674",
+      "timestamp": "2026-08-30T19:47:40Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "consensus.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "expected 2 independent lookout_reviews entries, found 0. If this is a later rework round, Captain must REPLACE the previous round's reviews, not append to them",
+      "timestamp": "2026-08-30T19:54:53Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "consensus.sh",
+      "story_id": "R3DA-13674",
+      "result": "pass",
+      "message": "2 independent reviews (gpt-5.6-terra / design-fit, claude-sonnet-5 / defect-failure) at current PR head, all 3 acceptance criteria met by both, no unresolved high/blocking findings, both agree on diminishing returns",
+      "timestamp": "2026-08-30T20:58:27Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-31T08:10:34Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-31T13:29:06Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13674",
+      "result": "fail",
+      "message": "repo 'frontend' status is 'in_progress', not 'ready'",
+      "timestamp": "2026-08-31T14:04:48Z",
+      "recorded_by": "gate"
+    }
+  ],
+  "decision_log": [
+    {
+      "timestamp": "2026-08-30T11:43:08Z",
+      "actor": "human",
+      "type": "revision",
+      "summary": "plan_accepted sent back to planning for revision, round 1"
+    },
+    {
+      "timestamp": "2026-08-30T12:04:30Z",
+      "actor": "human",
+      "type": "human_approval",
+      "summary": "plan_accepted approved at phase plan_review"
+    },
+    {
+      "timestamp": "2026-08-30T12:04:30Z",
+      "actor": "tick",
+      "type": "human_approval",
+      "summary": "phase -> implementation: human_gates.plan_accepted is approved"
+    },
+    {
+      "timestamp": "2026-08-30T16:35:58Z",
+      "actor": "tick",
+      "type": "rework",
+      "summary": "reopened frontend work packages: gate reported failing checks"
+    },
+    {
+      "timestamp": "2026-08-31T07:18:24Z",
+      "actor": "human",
+      "type": "human_approval",
+      "summary": "delivery_accepted approved at phase delivery_gate"
+    },
+    {
+      "timestamp": "2026-08-31T07:18:24Z",
+      "actor": "tick",
+      "type": "human_approval",
+      "summary": "phase -> done: human_gates.delivery_accepted is approved"
+    },
+    {
+      "timestamp": "2026-08-31T08:10:31Z",
+      "actor": "human",
+      "type": "revision",
+      "summary": "delivery_accepted sent back to pr_review for revision, round 1: Huge bug!! Three elements in the same template scope all declare #resizer (lines 25, 59, 81). Angular template variable names must be unique within a view; duplicate names shadow each other and can cause subtle resolution issues with static analysis tools and future Angular compiler changes. Each separator already has a unique data-testid and CSS modifier — give each a distinct template reference variable instead:\n\n<!-- vertical separator inside .main__trees -->\n#verticalResizer   (mousedown)=\"onResizerMouseDown($event, verticalResizer)\"\n\n<!-- first horizontal separator -->\n#leftResizer       (mousedown)=\"onResizerMouseDown($event, leftResizer)\"\n\n<!-- second horizontal separator -->\n#rightResizer      (mousedown)=\"onResizerMouseDown($event, rightResizer)\""
+    },
+    {
+      "timestamp": "2026-08-31T08:19:37Z",
+      "actor": "human",
+      "type": "package_decision",
+      "summary": "WP1 -> done"
+    },
+    {
+      "timestamp": "2026-08-31T08:40:15Z",
+      "actor": "human",
+      "type": "revision",
+      "summary": "delivery_accepted sent back to pr_review for revision, round 2: Duplicate #resizer template variable causes incorrect element references in event handlers\n\nAll three resizer elements — the new vertical one (inside .main__trees) and the two horizontal ones — share the same #resizer template reference variable within the same @if view scope.\n\nPreviously the horizontal resizers didn't use inline (mousedown) bindings; instead viewChildren('resizer') collected them and ngAfterViewInit attached listeners via Renderer2. That approach worked fine with duplicate names.\n\nNow that all three use inline (mousedown)=\"onResizerMouseDown($event, resizer)\", Angular resolves the resizer identifier against the view's local variable context, which is overwritten each time an element with #resizer is encountered during rendering. This means all three event handlers end up passing the last-declared #resizer element (the second horizontal resizer) as the resizer argument, breaking the getAdjacentPanels lookup for the first two.\n\nGive each resizer a unique template variable name:\n\n<!-- vertical tree-height resizer -->\n<div class=\"resizer resizer--vertical\" #treeHeightResizer ... (mousedown)=\"onResizerMouseDown($event, treeHeightResizer)\"></div>\n\n<!-- horizontal resizers -->\n<div class=\"resizer\" #leftResizer data-resize-axis=\"x\" (mousedown)=\"onResizerMouseDown($event, leftResizer)\"></div>\n<div class=\"resizer\" #rightResizer data-resize-axis=\"x\" (mousedown)=\"onResizerMouseDown($event, rightResizer)\"></div>"
+    }
+  ],
+  "human_gates": {
+    "plan_accepted": {
+      "status": "approved",
+      "timestamp": "2026-08-30T12:04:30Z"
+    }
+  },
+  "revisions": {
+    "plan_accepted": 1,
+    "delivery_accepted": 2
+  },
+  "credits": {
+    "sessions": {
+      "1c472e4a-d9e7-4c12-bbeb-210af5f195d0": {
+        "aiu": 80.2468,
+        "input_tokens": 2082668,
+        "output_tokens": 23908,
+        "turns": 42,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "1d7ce847-30b8-4bcd-bc5c-b36673e74ba0": {
+        "aiu": 113.3645,
+        "input_tokens": 2649765,
+        "output_tokens": 40734,
+        "turns": 45,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "28dcb34b-52e4-45e2-a5fd-510622690b91": {
+        "aiu": 107.50177,
+        "input_tokens": 2857264,
+        "output_tokens": 31733,
+        "turns": 49,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "316e1058-7eaf-4308-b555-e2796df2f34c": {
+        "aiu": 216.923455,
+        "input_tokens": 7780233,
+        "output_tokens": 37949,
+        "turns": 82,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "3612a1d2-bbea-4a30-ab53-d6875c5417b1": {
+        "aiu": 185.30259,
+        "input_tokens": 5814814,
+        "output_tokens": 43108,
+        "turns": 82,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "37cd5b5b-9739-4401-ae0c-d79e48605f02": {
+        "aiu": 257.35194,
+        "input_tokens": 8674837,
+        "output_tokens": 53843,
+        "turns": 120,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "3f22b3d1-3b6d-4111-b2e4-02077b785c48": {
+        "aiu": 110.48618,
+        "input_tokens": 2744560,
+        "output_tokens": 37511,
+        "turns": 46,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "41749c39-6471-4f8c-981a-43f27cbc4d17": {
+        "aiu": 131.510855,
+        "input_tokens": 4102409,
+        "output_tokens": 19644,
+        "turns": 65,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "4864facf-9bf7-4b3c-86c0-8f8e748e6960": {
+        "aiu": 161.25039,
+        "input_tokens": 4170350,
+        "output_tokens": 52407,
+        "turns": 69,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "50e3f67a-e883-44d0-bc39-f15fd0b7cb20": {
+        "aiu": 22.26356,
+        "input_tokens": 149406,
+        "output_tokens": 9713,
+        "turns": 5,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "5665b72a-819e-481a-ba1e-0b5dc894dd55": {
+        "aiu": 114.407615,
+        "input_tokens": 3624593,
+        "output_tokens": 22572,
+        "turns": 54,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "61d94f79-f15c-4a1d-8a97-82c1788886eb": {
+        "aiu": 145.5541,
+        "input_tokens": 4478970,
+        "output_tokens": 35155,
+        "turns": 68,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "71c8f4c3-e69b-48dd-be22-c923421d072d": {
+        "aiu": 5.63898,
+        "input_tokens": 35070,
+        "output_tokens": 1698,
+        "turns": 2,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "72bd4a0a-1707-47f7-8707-89c3c04cd962": {
+        "aiu": 165.525605,
+        "input_tokens": 5913195,
+        "output_tokens": 23224,
+        "turns": 73,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "7c3cbe9b-ecad-441a-9774-07c8eb2d5624": {
+        "aiu": 160.03699,
+        "input_tokens": 3208848,
+        "output_tokens": 37266,
+        "turns": 56,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "ae4c307a-8e71-4954-ab49-dc6af9acb464": {
+        "aiu": 151.33409,
+        "input_tokens": 4061586,
+        "output_tokens": 47022,
+        "turns": 68,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "be03701a-d759-4a13-957b-5ee8cfaae5fc": {
+        "aiu": 76.98054,
+        "input_tokens": 2571132,
+        "output_tokens": 13185,
+        "turns": 48,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "c87fa1ea-6e3d-49d2-b4bf-4b9240d6e693": {
+        "aiu": 154.5988,
+        "input_tokens": 4042758,
+        "output_tokens": 50978,
+        "turns": 62,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "dce77572-812d-4416-a584-c24c7a313309": {
+        "aiu": 98.93744,
+        "input_tokens": 2549688,
+        "output_tokens": 31378,
+        "turns": 49,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "dead38b9-da50-4854-be27-ef2dc79ff2b7": {
+        "aiu": 146.20977,
+        "input_tokens": 4406281,
+        "output_tokens": 36666,
+        "turns": 75,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "e74b5036-072c-41fb-bc9d-7066de5a4736": {
+        "aiu": 116.77261,
+        "input_tokens": 3261701,
+        "output_tokens": 32764,
+        "turns": 56,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "ee7920e0-b3bf-48e5-ab37-101dcf2bfba2": {
+        "aiu": 124.31182,
+        "input_tokens": 3039494,
+        "output_tokens": 43691,
+        "turns": 61,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T10:12:18Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "61e16a35-4344-4fcc-88e6-2eabd8a5c695": {
+        "aiu": 268.73059,
+        "input_tokens": 7339718,
+        "output_tokens": 65792,
+        "turns": 82,
+        "model": "claude-sonnet-5",
+        "phase": "implementation",
+        "actor": "a11y-reviewer",
+        "repo": "frontend",
+        "first_seen": "2026-08-31T14:04:48Z",
+        "updated": "2026-08-31T14:04:48Z"
+      }
+    },
+    "total_aiu": 3115.24099,
+    "total_input_tokens": 89559340,
+    "total_output_tokens": 791941,
+    "updated": "2026-08-31T14:04:48Z"
+  }
+}

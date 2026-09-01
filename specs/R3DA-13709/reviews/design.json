@@ -1,0 +1,15 @@
+{
+  "lens": "design",
+  "reviewed_shas": {
+    "backend": "ad459ba4e5ea766645908d7d1b7086f25f0ae2f7"
+  },
+  "criteria_verdicts": {
+    "AC1": "met",
+    "AC2": "met",
+    "AC3": "met"
+  },
+  "findings": [],
+  "unresolved_high_or_blocking_count": 0,
+  "diminishing_returns_agreed": true,
+  "consensus_status": "CONSENSUS_READY"
+}

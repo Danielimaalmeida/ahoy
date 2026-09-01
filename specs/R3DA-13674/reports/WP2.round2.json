@@ -1,0 +1,84 @@
+{
+  "work_package_id": "WP2",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13674-combined-view-tree-vertical-resize",
+  "head_sha": "67bd2c09a104565e313045b6db07a52abc2f0872",
+  "status": "unverified",
+  "caller": "implementation-orchestrator",
+  "ticket_id": "R3DA-13674",
+  "plan_ref": ".ahoy-plan.md",
+  "phase": "accessibility-verification",
+  "next_agent": "implementation-orchestrator",
+  "rework_note": "Dispatch cited PR #401 CI failures (format / SonarQube-lint) on runs 43860383/43860384. Verified these were on an earlier commit; WP1 (frontend-implementer) already fixed them across commits 2640c50, 08765d3, 86054ba, cea51ca, 67bd2c0. HEAD (67bd2c0) has both 'Linting & Formatting' (run 43861782) and 'Unit Tests & E2E Tests' (run 43861783) checks green on GitHub, and `gh pr checks 401` shows 8/8 passed, 0 failed. Reconfirmed locally: `npm run lint` clean, `npm run format` clean (only warns on the harness-provided, uncommitted .ahoy-plan.md), 35/35 Vitest unit tests pass. No CI-fix action was needed on this dispatch; proceeded to the actual WP2 scope (accessibility review) per the approved plan.",
+  "acceptance_criteria_mapping": {
+    "AC1": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.html adds a fourth resizer bar (`.resizer.resizer--vertical`, data-testid=\"combined-tree-height-resizer\") between the electrical and mechanical `<cdm-dual-tree>` panels inside `.main__trees`, with `role=\"separator\"`, `aria-orientation=\"horizontal\"` (correct per WAI-ARIA APG Window Splitter pattern: the bar is a horizontal line dragged vertically), `tabindex=\"0\"`, `aria-label`, and dynamic `aria-valuemin/valuenow/valuemax` bound to `treeHeightResizerAriaValues()`. combined-structure.component.ts adds `onTreeHeightResizerKeyDown` (ArrowUp/ArrowDown, 24px step) and orientation-aware `onResizerMouseDown`/`resizePanelsByOffset`/`getMinHeight`. Proven by: unit test 'resizes tree panel height via keyboard arrow keys on the separator' (combined-structure.component.spec.ts:409) and identically-named Playwright test in combined-structure-tree-height-resize.e2e.spec.ts:51, plus 'resizes tree panel height via vertical drag handle' (e2e spec:76). Both the assigned unit test and the e2e spec file name appear verbatim in the diff.",
+    "AC2": "Same drag-to-resize mechanism as the existing width resizers is generalized (shared `startDrag`/`resizePanelsByOffset`, orientation resolved via `data-resize-axis=\"y\"`) rather than a parallel implementation. Proven by: e2e test 'drag handle updates electrical and mechanical tree heights independently' (combined-structure-tree-height-resize.e2e.spec.ts:86), which drags +260px then -320px and asserts both panels' heights move independently and correctly in each direction.",
+    "AC3": "`getMinHeight`/`getMinSize` reads each `cdm-dual-tree` panel's computed `min-height` (180px, set via `--combined-tree-panel-min-height` in combined-structure.component.scss) and `resizePanelsByOffset` clamps the drag/keyboard offset so neither panel's size can go below its minimum. Proven by: e2e test 'clamps tree panel height at configured minimum during drag' (combined-structure-tree-height-resize.e2e.spec.ts:101), which drags -2000px and +4000px and asserts each panel is clamped at its configured min-height (with 1px tolerance)."
+  },
+  "test_ids_delivered": {
+    "combined-structure-tree-height-resize.e2e.spec.ts": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts (new file, 4 tests, all 4 assigned scenario names present verbatim)",
+    "resizes tree panel height via keyboard arrow keys on the separator": "present in both playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts:51 and src/.../combined-structure.component.spec.ts:409 (unit-level equivalent)",
+    "resizes tree panel height via vertical drag handle": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts:76",
+    "drag handle updates electrical and mechanical tree heights independently": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts:86",
+    "clamps tree panel height at configured minimum during drag": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts:101"
+  },
+  "changed_files": "none (review-only)",
+  "validation_commands": [
+    {
+      "command": "gh pr checks 401",
+      "result": "8 passed, 0 failed on current HEAD (67bd2c0) \u2014 the format/lint failures named in the dispatch were on stale runs 43860383/43860384, already superseded"
+    },
+    {
+      "command": "gh run view 43861782 / 43861783 --json headSha,conclusion",
+      "result": "both success, headSha=67bd2c0, confirming Linting & Formatting and Unit Tests & E2E Tests are green on the current HEAD"
+    },
+    {
+      "command": "npm run lint",
+      "result": "eslint + stylelint pass with no errors"
+    },
+    {
+      "command": "npm run format",
+      "result": "prettier check passes for all repository files; only warns on the harness-provided, uncommitted .ahoy-plan.md, which is not part of the delivered diff"
+    },
+    {
+      "command": "npm run test (ng test --include combined-structure.component.spec.ts)",
+      "result": "35/35 Vitest unit tests pass, including 'renders aria-valuemin, aria-valuenow and aria-valuemax on the separator', 'resizes tree panel height via keyboard arrow keys on the separator', 'ignores non-arrow keys'"
+    },
+    {
+      "command": "npm run start:keycloak (Keycloak on :7008, ng serve on :4200, mock-server on :3000)",
+      "result": "started successfully; curl -o /dev/null -w '%{http_code}' returned 200 for both :4200 and :7008, confirming the running app was reachable this session"
+    },
+    {
+      "command": "npx playwright test playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts (real msedge browser, against the running app)",
+      "result": "4/4 passed: keyboard arrow-key resize + live aria-valuenow/min/max updates, vertical drag handle resize, independent per-panel drag resize, and minimum-height clamping in both directions \u2014 all confirmed functionally correct in a real running browser this session"
+    },
+    {
+      "command": "Playwright-browser_navigate / Playwright-browser_press_key / Playwright-browser_resize (MCP tool)",
+      "result": "denied \u2014 'Permission denied and could not request permission from user' on every attempt (7 attempts across different URLs including about:blank, localhost:4200, 127.0.0.1:4200, example.com, and a Tab keypress); read-only MCP tools (snapshot, find, screenshot) worked but only against the blank tab, so manual/visual keyboard-and-focus exploration of the live page could not be performed this session despite the dev server running correctly"
+    }
+  ],
+  "remaining_gaps": [
+    {
+      "severity": "low",
+      "detail": "Visual focus-indicator appearance/contrast for the new separator (WCAG 2.4.7) could not be screenshotted or manually Tab-navigated this session because the interactive Playwright-browser MCP tool (navigate/press_key/resize) denied permission on every attempt, including against an already-loaded blank tab. Code inspection found no CSS rule suppressing the outline for `.resizer`/`.resizer--vertical` or globally in styles.scss/utilities.scss, so the browser's native focus ring should render by default (native-before-ARIA, no color-only reliance) \u2014 but this is reasoning from markup, not an exercised observation, so it is reported as unverified rather than assumed passing, per this repository's own review policy."
+    },
+    {
+      "severity": "low",
+      "detail": "Home/End keyboard shortcuts (jump to min/max) are not implemented on the new separator. This is an APG-recommended enhancement for the Window Splitter pattern, not a WCAG success-criterion requirement, and is not named in any assigned test_id \u2014 flagged as a non-blocking future enhancement, not a defect."
+    },
+    {
+      "severity": "low",
+      "detail": "The pre-existing three horizontal (width) resizer bars still carry no `role`/`aria-orientation`/keyboard support at all (unchanged by this PR). The approved plan (\u00a74.7) explicitly scoped retrofitting them as optional ('do not expand scope to rework them if it is not trivial'), so this is a documented pre-existing gap, not a regression introduced here."
+    },
+    {
+      "severity": "low",
+      "detail": "The shipped minimum tree-panel height is 180px (`--combined-tree-panel-min-height` in combined-structure.component.scss), not the 150px value the approved plan (\u00a74.5) explicitly decided and instructed the implementer to ship as-is unless a documented usability defect justified a change. No commit message or PR text records the reason for this deviation, though the plan's own risk section requires such a change to be 'recorded... as evidence.' This is a process/documentation gap for the caller to note, not an accessibility defect \u2014 180px is strictly larger (more generous) than 150px, so it does not weaken usability or a11y."
+    }
+  ],
+  "density_evidence": "not-applicable \u2014 review-only pass, no new UI construction; the changed component reuses the existing .resizer visual pattern already built with the repository's design tokens (var(--ds-color-surface-neutral-mild)), no new Density component selection was needed for this review",
+  "figma_evidence": "not-applicable \u2014 no Figma reference exists for R3DA-13674 per the approved plan (\u00a72, 'No Figma reference is present in jira-source.md')",
+  "e2e_evidence": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts run live via `npx playwright test` (real msedge browser, dev server up on :4200 with Keycloak) \u2014 all 4 tests passed, exercising AC1 (keyboard arrow resize + live ARIA value updates, vertical drag handle), AC2 (independent per-panel drag resize), and AC3 (minimum-height clamp in both directions). This is real running-app evidence obtained via CLI Playwright rather than the interactive Playwright-browser MCP tool, because that MCP tool denied permission for every state-changing action (navigate/press_key/resize) this session \u2014 documented in remaining_gaps as the reason full manual/visual accessibility exploration (focus-ring appearance, ad-hoc Tab-order walk) could not be completed.",
+  "assumption_check": "No unresolved assumptions remain about the assigned acceptance criteria or accessibility semantics; the one open item (visual focus-indicator confirmation) is reported as unverified rather than assumed, per the no-assumptions rule.",
+  "handback_to": "not-applicable"
+}

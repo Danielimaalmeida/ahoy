@@ -1,0 +1,537 @@
+{
+  "story_id": "R3DA-13709",
+  "jira_url": "https://atc.asdgroup.net/jira/browse/R3DA-13709",
+  "phase": "done",
+  "plan_path": "specs/R3DA-13709/implementation-plan.md",
+  "rework_ceiling": 3,
+  "navigator": {
+    "completeness": "FULL",
+    "open_questions": []
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "text": "The /electrical-structures/{masterString}/eplan endpoint (API v2) accepts and persists the new attributes property sent by SAS for non-ARTICLE nodes, end to end",
+      "source_quote": "Deploy new API to support SAP integration with changes from August 2026.",
+      "repo": "backend",
+      "status": "planned",
+      "test_ids": [
+        "uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren"
+      ]
+    },
+    {
+      "id": "AC2",
+      "text": "niooo uses the attributes property sent by SAS as node properties in the electrical structure (stored and displayed via the existing generic attributes mechanism), and children of a node carrying attributes are preserved",
+      "source_quote": "Use the \"attributes\" fields to store and display any extra information provided by SAP. niooo should use the attributes property sent by SAS and use them as node properties in the electrical structure.",
+      "repo": "backend",
+      "status": "planned",
+      "test_ids": [
+        "toElectricalPartMapsAttributesAsNodePropertiesForNonArticleNodes",
+        "toElectricalPartPreservesChildrenWhenAttributesArePresent"
+      ]
+    },
+    {
+      "id": "AC3",
+      "text": "Precedence rule: use attributes if present; else use articleData if present; else leave the node without attributes and continue processing normally",
+      "source_quote": "We first check if the node has attributes set, if it has, then we use the attributes property. If not, we check if the node has articleData set and use. If none of the properties are set, then we simply ignore and proceed.",
+      "repo": "backend",
+      "status": "planned",
+      "test_ids": [
+        "toElectricalPartPrefersAttributesOverArticleDataWhenBothPresent",
+        "toElectricalPartFallsBackToArticleDataWhenAttributesAbsent",
+        "toElectricalPartLeavesNodeUnattributedWhenNeitherPropertyPresent"
+      ]
+    }
+  ],
+  "child_repos": [
+    {
+      "repo": "backend",
+      "slug": "zxc-github.azure.cloud.asd/qwerty/r3da_cdm_backend",
+      "branch": "feature/R3DA-13709-sas-attributes-eplan",
+      "head_sha": "226577bb194758cc96b532fb894e3cb29c979d44",
+      "status": "ready",
+      "retry_count": 0,
+      "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_backend/pull/352",
+      "pr_number": 352
+    }
+  ],
+  "lookout_reviews": [
+    {
+      "lens": "design",
+      "reviewed_shas": {
+        "backend": "ad459ba4e5ea766645908d7d1b7086f25f0ae2f7"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "met",
+        "AC3": "met"
+      },
+      "findings": [],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true,
+      "consensus_status": "CONSENSUS_READY",
+      "model": "claude-opus-5"
+    },
+    {
+      "lens": "defect",
+      "reviewed_shas": {
+        "backend": "ad459ba4e5ea766645908d7d1b7086f25f0ae2f7"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "met",
+        "AC3": "met"
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "summary": "resolveNodeAttributes() treats a non-null but empty `attributes` map (e.g. `\"attributes\": {}`) as 'present', which fully suppresses any populated `articleData` on the same node with no fallback and no test covering this boundary. Per the business model attributes and articleData are not expected on the same node type today, so the risk is theoretical, but the empty-vs-null distinction is unhandled and unasserted.",
+          "location": "backend: src/main/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapper.java (resolveNodeAttributes)"
+        },
+        {
+          "severity": "low",
+          "summary": "No unit test exercises children-preservation specifically through the articleData fallback branch (toElectricalPartFallsBackToArticleDataWhenAttributesAbsent uses a childless node). The plan documents a previously-dropped-children bug in that exact branch; a regression reintroducing it there would not be caught by the current unit suite, only incidentally by the IT fixture where ARTICLE nodes happen to be leaves.",
+          "location": "backend: src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java (toElectricalPartFallsBackToArticleDataWhenAttributesAbsent)"
+        }
+      ],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true,
+      "consensus_status": "CONSENSUS_READY",
+      "model": "gpt-5.4"
+    }
+  ],
+  "gate_results": [
+    {
+      "gate": "intake.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "snapshot present with description, 3 acceptance criteria and stated boundaries; Navigator reported FULL",
+      "timestamp": "2026-08-29T16:23:08Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "state.json has no plan_path set",
+      "timestamp": "2026-08-29T16:23:09Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: backend",
+      "timestamp": "2026-08-29T16:29:14Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: backend",
+      "timestamp": "2026-08-29T16:31:04Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "plan.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "plan_path exists, 3 acceptance criteria grounded in Jira with test_ids, 2 work package(s) across: backend",
+      "timestamp": "2026-08-29T16:32:02Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 4 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:41:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 3 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:42:02Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:51:11Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:51:20Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:51:49Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running; poll again rather than recording ready",
+      "timestamp": "2026-08-29T16:53:19Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "repo 'backend' ready: PR #352 open at ad459ba4e5ea766645908d7d1b7086f25f0ae2f7, 11 check(s) green, 6 planned test(s) present in the diff",
+      "timestamp": "2026-08-29T16:56:07Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "pr.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "1 ready repositories have no pr_url set",
+      "timestamp": "2026-08-29T16:56:08Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "repo 'backend' ready: PR #352 open at ad459ba4e5ea766645908d7d1b7086f25f0ae2f7, 11 check(s) green, 6 planned test(s) present in the diff",
+      "timestamp": "2026-08-29T16:56:38Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "pr.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "all 1 child repositories ready with open pull requests linked to R3DA-13709",
+      "timestamp": "2026-08-29T16:56:39Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "consensus.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "expected 2 independent lookout_reviews entries, found 0. If this is a later rework round, Captain must REPLACE the previous round's reviews, not append to them",
+      "timestamp": "2026-08-29T16:56:42Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "consensus.sh",
+      "story_id": "R3DA-13709",
+      "result": "pass",
+      "message": "2 independent reviews (claude-opus-5 / design, gpt-5.4 / defect) at current PR head, all 3 acceptance criteria met by both, no unresolved high/blocking findings, both agree on diminishing returns",
+      "timestamp": "2026-08-29T17:05:16Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 4 check(s) still running (Linting / lint, Unit tests / junit, Integration tests / integration-tests, sonarqube / sonarqube); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:01:15Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 4 check(s) still running (Linting / lint, Unit tests / junit, Integration tests / integration-tests, sonarqube / sonarqube); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:01:51Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 4 check(s) still running (Linting / lint, Unit tests / junit, Integration tests / integration-tests, sonarqube / sonarqube); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:02:26Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 3 check(s) still running (Linting / lint, Integration tests / integration-tests, sonarqube / sonarqube); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:03:04Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 3 check(s) still running (Linting / lint, Integration tests / integration-tests, sonarqube / sonarqube); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:03:37Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 2 check(s) still running (Linting / lint, Integration tests / integration-tests); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:04:13Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:04:45Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:05:17Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:05:48Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:06:20Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:06:52Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:07:24Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:07:56Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:08:28Z",
+      "recorded_by": "gate"
+    },
+    {
+      "gate": "child_ready.sh",
+      "story_id": "R3DA-13709",
+      "result": "fail",
+      "message": "PR #352 has 1 check(s) still running (Linting / lint); poll again rather than recording ready",
+      "timestamp": "2026-08-31T08:08:59Z",
+      "recorded_by": "gate"
+    }
+  ],
+  "decision_log": [
+    {
+      "timestamp": "2026-08-29T16:23:09Z",
+      "actor": "tick",
+      "type": "blocked",
+      "summary": "phase -> blocked: gates/plan.sh failed: planning"
+    },
+    {
+      "timestamp": "2026-08-29T16:32:28Z",
+      "actor": "tick",
+      "type": "human_approval",
+      "summary": "phase -> implementation: human_gates.plan_accepted is approved"
+    },
+    {
+      "timestamp": "2026-08-29T17:07:10Z",
+      "actor": "tick",
+      "type": "human_approval",
+      "summary": "phase -> done: human_gates.delivery_accepted is approved"
+    },
+    {
+      "timestamp": "2026-08-31T07:52:13Z",
+      "actor": "human",
+      "type": "revision",
+      "summary": "delivery_accepted sent back to pr_review for revision, round 1: Huge bug found. Three elements in the same template scope all declare #resizer (lines 25, 59, 81). Angular template variable names must be unique within a view; duplicate names shadow each other and can cause subtle resolution issues with static analysis tools and future Angular compiler changes. Each separator already has a unique data-testid and CSS modifier — give each a distinct template reference variable instead:\n\n<!-- vertical separator inside .main__trees -->\n#verticalResizer   (mousedown)=\"onResizerMouseDown($event, verticalResizer)\"\n\n<!-- first horizontal separator -->\n#leftResizer       (mousedown)=\"onResizerMouseDown($event, leftResizer)\"\n\n<!-- second horizontal separator -->\n#rightResizer      (mousedown)=\"onResizerMouseDown($event, rightResizer)\""
+    }
+  ],
+  "human_gates": {
+    "plan_accepted": {
+      "status": "approved",
+      "timestamp": "2026-08-29T16:32:28Z"
+    }
+  },
+  "work_packages": [
+    {
+      "id": "WP1",
+      "repo": "backend",
+      "agent": "backend-implementer",
+      "branch_slug": "sas-attributes-eplan",
+      "depends_on": [],
+      "open_pr": false,
+      "status": "done",
+      "acceptance_criteria": [
+        "AC1",
+        "AC2",
+        "AC3"
+      ],
+      "in_progress_rounds": 0,
+      "rework_note": "Huge bug found. Three elements in the same template scope all declare #resizer (lines 25, 59, 81). Angular template variable names must be unique within a view; duplicate names shadow each other and can cause subtle resolution issues with static analysis tools and future Angular compiler changes. Each separator already has a unique data-testid and CSS modifier — give each a distinct template reference variable instead:\n\n<!-- vertical separator inside .main__trees -->\n#verticalResizer   (mousedown)=\"onResizerMouseDown($event, verticalResizer)\"\n\n<!-- first horizontal separator -->\n#leftResizer       (mousedown)=\"onResizerMouseDown($event, leftResizer)\"\n\n<!-- second horizontal separator -->\n#rightResizer      (mousedown)=\"onResizerMouseDown($event, rightResizer)\""
+    },
+    {
+      "id": "WP2",
+      "repo": "backend",
+      "agent": "backend-test-engineer",
+      "branch_slug": "sas-attributes-eplan",
+      "depends_on": [
+        "WP1"
+      ],
+      "open_pr": true,
+      "status": "done",
+      "acceptance_criteria": [
+        "AC1",
+        "AC2",
+        "AC3"
+      ],
+      "in_progress_rounds": 0,
+      "rework_note": "Huge bug found. Three elements in the same template scope all declare #resizer (lines 25, 59, 81). Angular template variable names must be unique within a view; duplicate names shadow each other and can cause subtle resolution issues with static analysis tools and future Angular compiler changes. Each separator already has a unique data-testid and CSS modifier — give each a distinct template reference variable instead:\n\n<!-- vertical separator inside .main__trees -->\n#verticalResizer   (mousedown)=\"onResizerMouseDown($event, verticalResizer)\"\n\n<!-- first horizontal separator -->\n#leftResizer       (mousedown)=\"onResizerMouseDown($event, leftResizer)\"\n\n<!-- second horizontal separator -->\n#rightResizer      (mousedown)=\"onResizerMouseDown($event, rightResizer)\""
+    }
+  ],
+  "branch_prefix": "feature",
+  "revisions": {
+    "delivery_accepted": 1
+  },
+  "credits": {
+    "sessions": {
+      "09cec783-49a4-4d04-8946-a36bb06ed3ff": {
+        "aiu": 97.85657,
+        "input_tokens": 2009542,
+        "output_tokens": 20708,
+        "turns": 41,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "34d479c4-9b4f-46f8-8352-bac310f4c9e7": {
+        "aiu": 62.633725,
+        "input_tokens": 1184923,
+        "output_tokens": 12975,
+        "turns": 26,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "5709ed4e-da0b-40a9-984b-d0a743b9ab98": {
+        "aiu": 85.336405,
+        "input_tokens": 2068755,
+        "output_tokens": 18245,
+        "turns": 40,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "618d2e42-63ef-4c9f-91cd-e6365789b7f9": {
+        "aiu": 69.735435,
+        "input_tokens": 1592669,
+        "output_tokens": 20417,
+        "turns": 37,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "746f4d9b-690f-4e9a-9566-529abcdc3804": {
+        "aiu": 1.825705,
+        "input_tokens": 11007,
+        "output_tokens": 101,
+        "turns": 1,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "b059fbf8-c616-438c-83b1-790c6449338b": {
+        "aiu": 48.15391,
+        "input_tokens": 1169178,
+        "output_tokens": 12146,
+        "turns": 32,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "bc460951-fd81-43c8-923b-e7141b0b21cd": {
+        "aiu": 32.708865,
+        "input_tokens": 745391,
+        "output_tokens": 7892,
+        "turns": 24,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      },
+      "d75f12ea-d716-44ea-b914-566332b1058e": {
+        "aiu": 102.549335,
+        "input_tokens": 2387337,
+        "output_tokens": 21706,
+        "turns": 62,
+        "model": "gpt-5.3-codex",
+        "phase": "implementation",
+        "actor": "backfilled",
+        "repo": "backend",
+        "first_seen": "2026-08-31T10:13:17Z",
+        "updated": "2026-08-31T10:13:17Z"
+      }
+    },
+    "total_aiu": 500.79995,
+    "total_input_tokens": 11168802,
+    "total_output_tokens": 114190,
+    "updated": "2026-08-31T10:13:17Z"
+  }
+}

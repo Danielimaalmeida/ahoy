@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# tests/bin/gh — a fake `gh` for gate tests.
+#
+# This exists only because lib.sh already had the seam:
+#     GH_BIN="${HARNESS_GH_BIN:-gh}"
+# Pointing that at this script makes every GitHub-facing gate runnable with no
+# network, no credentials and no real pull request, which is what lets the
+# exit-code contract be tested instead of asserted in a README.
+#
+# Behaviour is driven by env vars set by tests/run.sh:
+#   STUB_GH_DIR    directory holding pr.json / pr-list.json / diff.patch
+#   STUB_GH_AUTH   exit code for `auth status` (default 0)
+
+set -uo pipefail
+DIR="${STUB_GH_DIR:-}"
+
+apply_jq() {          # apply a trailing --jq expression if one was passed
+  local expr="" a PREV=""
+  for a in "$@"; do
+    if [ "${PREV:-}" = "--jq" ]; then expr="$a"; fi
+    PREV="$a"
+  done
+  if [ -n "$expr" ]; then jq -r "$expr"; else cat; fi
+}
+
+case "${1:-}" in
+  auth)
+    exit "${STUB_GH_AUTH:-0}" ;;
+  pr)
+    case "${2:-}" in
+      list) cat "${DIR}/pr-list.json" | apply_jq "$@" ;;
+      view) cat "${DIR}/pr.json"      | apply_jq "$@" ;;
+      diff) cat "${DIR}/diff.patch" ;;
+      *) echo "stub gh: unsupported pr subcommand ${2:-}" >&2; exit 1 ;;
+    esac ;;
+  --version) echo "gh version 0.0.0-stub" ;;
+  *) echo "stub gh: unsupported command ${1:-}" >&2; exit 1 ;;
+esac

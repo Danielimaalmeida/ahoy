@@ -1,0 +1,26 @@
+{
+  "lens": "defect",
+  "reviewed_shas": {
+    "backend": "ad459ba4e5ea766645908d7d1b7086f25f0ae2f7"
+  },
+  "criteria_verdicts": {
+    "AC1": "met",
+    "AC2": "met",
+    "AC3": "met"
+  },
+  "findings": [
+    {
+      "severity": "low",
+      "summary": "resolveNodeAttributes() treats a non-null but empty `attributes` map (e.g. `\"attributes\": {}`) as 'present', which fully suppresses any populated `articleData` on the same node with no fallback and no test covering this boundary. Per the business model attributes and articleData are not expected on the same node type today, so the risk is theoretical, but the empty-vs-null distinction is unhandled and unasserted.",
+      "location": "backend: src/main/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapper.java (resolveNodeAttributes)"
+    },
+    {
+      "severity": "low",
+      "summary": "No unit test exercises children-preservation specifically through the articleData fallback branch (toElectricalPartFallsBackToArticleDataWhenAttributesAbsent uses a childless node). The plan documents a previously-dropped-children bug in that exact branch; a regression reintroducing it there would not be caught by the current unit suite, only incidentally by the IT fixture where ARTICLE nodes happen to be leaves.",
+      "location": "backend: src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java (toElectricalPartFallsBackToArticleDataWhenAttributesAbsent)"
+    }
+  ],
+  "unresolved_high_or_blocking_count": 0,
+  "diminishing_returns_agreed": true,
+  "consensus_status": "CONSENSUS_READY"
+}

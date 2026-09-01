@@ -1,0 +1,15 @@
+# Local child-repository working copies
+workspaces/*
+!workspaces/.gitkeep
+
+# Local configuration and secrets
+.env
+.env.*
+*.local
+**/secrets.*
+.DS_Store
+.envrc
+./work
+.playright-mcp/*
+./work/*
+__pycache__/

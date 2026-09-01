@@ -1,0 +1,76 @@
+{
+  "work_package_id": "WP2",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13674-combined-view-tree-vertical-resize",
+  "head_sha": "17c5c79d0da9c3852df595cad3c3bcfb90f894a7",
+  "status": "unverified",
+  "rework_note": "Dispatch ATTENTION flagged that three elements in combined-structure.component.html all declared the duplicate template reference variable #resizer (lines 25, 59, 81) and asked for unique names (#verticalResizer/#leftResizer/#rightResizer). Confirmed this is already fixed on HEAD (commit 17c5c79, R3DA-13674 fix combined resizer element references, pushed before this review dispatch): each resizer now has a unique reference variable (#treeHeightResizer for the new vertical bar, #leftResizer, #rightResizer), each correctly bound in its own (mousedown)=onResizerMouseDown($event, ownVar). Functionally identical to the requested fix, with a different exact name for the vertical one; still unique across the template. No further code change was needed or made.",
+  "acceptance_criteria_mapping": {
+    "AC1": "src/app/features/facility/components/containers/combined-structure/combined-structure.component.html adds a new .resizer.resizer--vertical div (#treeHeightResizer) between the electrical and mechanical cdm-dual-tree panels inside .main__trees, with role=separator, aria-orientation=horizontal (correct per WAI-ARIA APG Window Splitter, since the divider is a horizontal line moved with Up/Down), tabindex=0, dynamic aria-valuemin/aria-valuenow/aria-valuemax, and aria-label. combined-structure.component.ts adds orientation-aware resize logic (getResizeAxis, getMinHeight, onTreeHeightResizerKeyDown handling ArrowUp/ArrowDown at a 24px step, onTreeHeightResizerFocus). Proven by playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts tests named resizes tree panel height via keyboard arrow keys on the separator and resizes tree panel height via vertical drag handle, both passing.",
+    "AC2": "Same files as AC1. onResizerMouseDown/startDrag/resizePanelsByOffset were generalized to read clientY/height for the y axis (data-resize-axis=y on the new separator), matching the existing horizontal drag-to-resize pattern rather than adding a parallel implementation. Proven by test drag handle updates electrical and mechanical tree heights independently, which drags the handle twice in opposite directions and asserts each tree panel height changes independently and inversely.",
+    "AC3": "getMinSize/getMinHeight in combined-structure.component.ts clamp using each tree panel computed min-height (180px via --combined-tree-panel-min-height in combined-structure.component.scss, applied to .main__tree-panel), falling back to MIN_TREE_PANEL_HEIGHT. Proven by test clamps tree panel height at configured minimum during drag, which drags far past both extremes and asserts each panel rendered height never drops below its configured min-height."
+  },
+  "test_ids_delivered": {
+    "note": "Review-only pass. All assigned test_ids were authored by WP1 (frontend-implementer) prior to this dispatch. This review confirmed they are present verbatim in the PR diff and passing in CI.",
+    "combined-structure-tree-height-resize.e2e.spec.ts": "playwright/tests/facility-pages/combined-structure-tree-height-resize.e2e.spec.ts (file present, all 4 tests passing)",
+    "resizes tree panel height via keyboard arrow keys on the separator": "same file, line 51 - passing in CI",
+    "resizes tree panel height via vertical drag handle": "same file, line 76 - passing in CI",
+    "drag handle updates electrical and mechanical tree heights independently": "same file, line 86 - passing in CI",
+    "clamps tree panel height at configured minimum during drag": "same file, line 101 - passing in CI"
+  },
+  "changed_files": "none (review-only)",
+  "validation_commands": [
+    {
+      "command": "npm run lint",
+      "result": "passed - eslint and stylelint both clean"
+    },
+    {
+      "command": "npx ng test --no-watch --no-progress --include=**/combined-structure.component.spec.ts",
+      "result": "passed - 35 of 35 unit tests green, run locally against HEAD"
+    },
+    {
+      "command": "gh pr checks 401",
+      "result": "all 8 checks passed after re-running the one job that had failed on HEAD"
+    },
+    {
+      "command": "gh run rerun 43890250 --failed, then gh run view 43890250",
+      "result": "the only failing check on HEAD (playwright tests e2e job 139842049, originally a 30s timeout in the unrelated pre-existing spec playwright/tests/accessability/combined-structure.a11y.e2e.spec.ts for facility 12345789-123456789) went green on re-run with the identical commit (new job 139944443). Confirmed this was a transient CI timeout, not a defect: dual-tree.component and the facade data-loading logic are untouched by this PR (git diff main --stat), and no other run since this a11y spec was added ever regressed on the axe-core assertion itself for this commit."
+    },
+    {
+      "command": "gh run view 43890250 --job 139944443 (log inspection)",
+      "result": "confirmed green, including: combined-structure.a11y.e2e.spec.ts (axe-core scan tagged wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa against the live rendered Combined view in both light and dark theme, zero violations reported, covering the new resizer element) and all 4 AC-assigned Playwright tests (keyboard arrow-key resize, vertical drag handle, independent drag updates for each panel, minimum-height clamp)."
+    },
+    {
+      "command": "attempted npm run start:keycloak plus Playwright-browser_navigate for a manual live keyboard/focus walkthrough",
+      "result": "blocked in this session: any bash command that opens a listening network port (ng serve, node mock-server/server.js, even a bare python3 -m http.server) is refused with Permission denied and could not request permission from user, in sync and async modes alike, while a detached docker run for keycloak alone succeeds. The MCP Playwright-browser_* tool was not exercised against a locally running instance as a result. Compensated with the CI evidence above, which drives a real browser against a real running deployment of this exact commit and covers both the keyboard interaction and a full automated WCAG 2.1/2.2 AA scan; treated as sufficient live-app evidence for the accessibility disposition below given it independently confirms zero regressions on the exact commit under review."
+    },
+    {
+      "command": "git show main:.../combined-structure.component.html (diff against origin/main)",
+      "result": "confirmed the two pre-existing horizontal (width) resizers had no tabindex, role, or keyboard handling before this PR either; this is an explicitly deferred, plan-scoped gap, not a regression."
+    }
+  ],
+  "remaining_gaps": [
+    {
+      "severity": "low",
+      "detail": "Live manual keyboard/focus verification through the MCP Playwright-browser tool against a locally running dev server could not be performed in this session, because the session bash tool refuses any command that opens a listening network port. This was compensated with CI evidence from the exact HEAD commit (job 139944443): a real-browser axe-core WCAG 2.1/2.2 AA scan reporting zero violations on the Combined view (light and dark theme), plus a passing keyboard-arrow-key resize test. Recommend a follow-up manual spot check of the focus ring appearance the next time a session with working server/browser tooling is available, though nothing in the automated evidence suggests a problem."
+    },
+    {
+      "severity": "low",
+      "detail": "The two pre-existing horizontal (panel-width) resizers (#leftResizer, #rightResizer) still have no role=separator, tabindex, or keyboard handling. Confirmed pre-existing on main (unchanged by this PR) and explicitly deferred by the approved plan (.ahoy-plan.md section 4.7: align the pre-existing three horizontal bars to equivalent semantics only if trivial, do not expand scope to rework them if it is not). No action required for this PR; worth a future backlog item for full parity."
+    },
+    {
+      "severity": "low",
+      "detail": ".resizer and .resizer--vertical in combined-structure.component.scss define no explicit :focus or :focus-visible style. No global outline reset was found in src/styles.scss, so the browser default focus ring should render on Tab focus, but the exact rendered appearance was not independently confirmed with a live screenshot due to the tooling gap noted above."
+    },
+    {
+      "severity": "informational",
+      "detail": "aria-label=Resize tree panel height (combined-structure.component.html line 31) is a hardcoded English string rather than routed through TranslatePipe. This matches every other aria-label already present in src/app/features/facility (pre-existing repository-wide convention), so it is not a regression introduced by this PR."
+    },
+    {
+      "severity": "informational",
+      "detail": "Plan-adherence note for the caller to triage with WP1 if desired: the approved plan (.ahoy-plan.md section 4.5) decided a minimum tree-panel height of 150px, but the shipped value has been 180px (MIN_TREE_PANEL_HEIGHT in combined-structure.component.ts, and the matching custom property in the SCSS) since the very first implementation commit, with no commit message or recorded rationale for the deviation the way the plan asks for. AC3 itself is unaffected, since the e2e test reads the configured min-height dynamically rather than asserting a literal 150; this is a traceability gap only, not a functional or accessibility defect."
+    }
+  ],
+  "assumption_check": "No unresolved assumptions were made in this review. One correction is worth recording: the dispatch named branch feature/R3DA-13674-combined-view-tree-vertical-resize-a11y, but only feature/R3DA-13674-combined-view-tree-vertical-resize exists locally and on origin, matching both the approved plan (.ahoy-plan.md section 10) and the already-open PR #401. Reviewed and reported against the actual existing branch rather than a name that does not exist, since open_pr is false and no branch-creation action was in scope for a review-only pass. Status is unverified rather than ready strictly per this role own instructions (a11y-reviewer.agent.md): the dev server could not be started in this session, so the required live Playwright-browser keyboard and focus walkthrough could not be run, even though every other signal (static analysis, unit tests, lint, and the CI Playwright run against this exact commit including a zero-violation axe-core WCAG scan) points to a correct and accessible implementation with no blocking or high-severity findings."
+}

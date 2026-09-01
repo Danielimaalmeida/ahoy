@@ -1,0 +1,38 @@
+{
+  "work_package_id": "WP1",
+  "repo": "frontend",
+  "repo_slug": "qwerty/r3da_cdm_frontend",
+  "branch": "feature/R3DA-13673-numeric-instance-order",
+  "head_sha": "e269ce3b579c749a4c8513891de87ddb01635210",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "Updated src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.ts to compare matching base-name instance labels by numeric # suffix before alphabetical fallback, preserving existing position-based sort behavior. Proven by three AC1 tests in src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts covering ascending (#2 before #10), descending (#10 before #2), and non-matching-base fallback alphabetical ordering."
+  },
+  "test_ids_delivered": {
+    "sorts repeating instances with matching base name in ascending numerical order (#2 before #10)": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+    "sorts repeating instances with matching base name in descending numerical order (#10 before #2)": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+    "falls back to alphabetical order when base names do not match up to the # character": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts"
+  },
+  "changed_files": [
+    "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.ts",
+    "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts"
+  ],
+  "validation_commands": [
+    {
+      "command": "rtk ng test --no-watch --no-progress --include src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+      "result": "failed: missing @angular/build:unit-test builder package before dependencies were installed"
+    },
+    {
+      "command": "rtk npm install --quiet",
+      "result": "passed"
+    },
+    {
+      "command": "rtk ng test --no-watch --no-progress --include src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.spec.ts",
+      "result": "passed (1 file, 33 tests)"
+    }
+  ],
+  "remaining_gaps": [],
+  "assumption_check": "No unresolved assumptions remain.",
+  "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/405",
+  "pr_number": 405
+}

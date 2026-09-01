@@ -1,0 +1,19 @@
+{
+  "lens": "defect-failure",
+  "reviewed_shas": {
+    "frontend": "44ce8e1f63db2c810037cd67b33919a0ebd3e0f2"
+  },
+  "criteria_verdicts": {
+    "AC1": "met"
+  },
+  "findings": [
+    {
+      "severity": "low",
+      "summary": "compareInstanceNumbers/getBaseNameFromLabel do exact-string base-name matching with no case normalization, so labels differing only by case (e.g. 'bg30#2' vs 'BG30#10') fall through to the localeCompare fallback instead of numeric ordering. Not required by AC1's wording ('name strings match') and no evidence real instance labels vary in case (getInstanceLabel always builds them from the same 'name' attribute), so this is a theoretical edge case rather than an observed defect.",
+      "location": "src/app/features/facility/mappers/mechanical-structure/mechanical-structure.mapper.ts: compareInstanceNumbers (lines ~277-295), getBaseNameFromLabel (lines ~209-211)"
+    }
+  ],
+  "unresolved_high_or_blocking_count": 0,
+  "diminishing_returns_agreed": true,
+  "consensus_status": "CONSENSUS_READY"
+}

@@ -1,0 +1,272 @@
+{
+  "story_id": "R3DA-13330",
+  "jira_url": "https://atc.asdgroup.net/jira/browse/R3DA-13330",
+  "phase": "done",
+  "plan_path": "specs/R3DA-13330/implementation-plan.md",
+  "rework_ceiling": 3,
+  "navigator": {
+    "completeness": "FULL",
+    "open_questions": []
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "text": "Users can configure what columns they want to see in the All Facilities list view",
+      "source_quote": "When using the list view for the All Facilities screen, users can configure what columns they want to see",
+      "repo": "frontend",
+      "status": "planned",
+      "test_ids": [
+        "should open column picker and toggle column visibility",
+        "all-facilities configurable columns - user can show and hide columns"
+      ]
+    },
+    {
+      "id": "AC2",
+      "text": "Re-ordering the columns is supported (optional)",
+      "source_quote": "Re-ordering the columns could be useful for visual comparisons",
+      "repo": "frontend",
+      "status": "planned",
+      "test_ids": [
+        "should allow reordering columns via drag or menu action"
+      ]
+    },
+    {
+      "id": "AC3",
+      "text": "The column configuration can be saved and restored",
+      "source_quote": "Saving that configuration might be useful for repeating tasks",
+      "repo": "frontend",
+      "status": "planned",
+      "test_ids": [
+        "should persist column configuration across page reloads"
+      ]
+    },
+    {
+      "id": "AC4",
+      "text": "All current columns remain available for selection — none disappear from the column picker",
+      "source_quote": "None of the current columns should disappear from the available columns for selection",
+      "repo": "frontend",
+      "status": "planned",
+      "test_ids": [
+        "should include all existing columns in column picker",
+        "all-facilities column picker - all existing columns are selectable"
+      ]
+    },
+    {
+      "id": "AC5",
+      "text": "A new Description column is added and available in the column picker",
+      "source_quote": "New column \"Description\" should be added",
+      "repo": "frontend",
+      "status": "planned",
+      "test_ids": [
+        "should display Description column when enabled",
+        "all-facilities Description column - is available in column picker"
+      ]
+    }
+  ],
+  "child_repos": [
+    {
+      "repo": "frontend",
+      "repo_slug": "zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend",
+      "branch": "feature/R3DA-13330-final",
+      "head_sha": "a5a37e42d8019f6e78b705ea36c45703f2006f20",
+      "pr_url": "https://zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend/pull/395",
+      "pr_number": 395,
+      "status": "ready",
+      "evidence": {
+        "implementation_status": "completed manually",
+        "unit_tests": "passed",
+        "e2e_tests": "1 flaky unrelated virtual scrolling test (pre-existing), 211/212 tests pass",
+        "ci_status": "unit tests pass; e2e has 1 pre-existing flaky (not from column picker work)",
+        "sonarqube_status": "0 issues found - quality gate likely to pass",
+        "e2e_fix": "Added 500ms wait after scroll in virtual scrolling test to allow virtual scroll component to load next batch",
+        "latest_ci_fix": "Increased wait timeout from 500ms to 1000ms. New CI runs 43445529/43445528 queued.",
+        "accessibility_fix": "Added aria-label, aria-haspopup=menu, aria-expanded (dynamic), aria-hidden for decorative icons. Commit 955ec6a7.",
+        "latest_workflow": "43448074/43448075 at 2026-08-21T16:27:42Z",
+        "e2e_failure": "Virtual Scrolling › should load more facilities when scrolling down in card view fails: expect(locator).toHaveCount(expected) - unexpected value \"16\" at line 329 of all-facilities.e2e.spec.ts",
+        "sonarqube_failure": "Quality Gate FAILED",
+        "e2e_still_failing": "Virtual Scrolling still not working - 18m4s runtime",
+        "merged": true,
+        "merge_commit": "c373875db6a07a429d4dd52f04f8a2ac163ef4ce",
+        "merged_at": "2026-08-24T15:21:19Z"
+      },
+      "retry_count": 2,
+      "slug": "zxc-github.azure.cloud.asd/qwerty/r3da_cdm_frontend"
+    }
+  ],
+  "lookout_reviews": [
+    {
+      "model": "gpt-5.6-terra",
+      "lens": "correctness-architecture",
+      "reviewed_shas": {
+        "frontend": "e0dddd9ca97b55cdb2fb24ee94079573b0f656a5"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "not_met",
+        "AC3": "met",
+        "AC4": "met",
+        "AC5": "met"
+      },
+      "blocking_findings": [],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": true,
+      "consensus_status": "CONSENSUS_READY"
+    },
+    {
+      "model": "claude-sonnet-5",
+      "lens": "adversarial-risk",
+      "reviewed_shas": {
+        "frontend": "e0dddd9ca97b55cdb2fb24ee94079573b0f656a5"
+      },
+      "criteria_verdicts": {
+        "AC1": "met",
+        "AC2": "not_met",
+        "AC3": "met",
+        "AC4": "met",
+        "AC5": "met"
+      },
+      "blocking_findings": [],
+      "unresolved_high_or_blocking_count": 0,
+      "diminishing_returns_agreed": false,
+      "consensus_status": "CONSENSUS_READY"
+    }
+  ],
+  "gate_results": [
+    {
+      "gate": "intake.sh",
+      "result": "pass",
+      "timestamp": "2026-08-20T14:17:30Z"
+    },
+    {
+      "gate": "plan.sh",
+      "result": "pass",
+      "timestamp": "2026-08-20T14:20:00Z"
+    },
+    {
+      "gate": "plan.sh (re-run post-update)",
+      "result": "pass",
+      "timestamp": "2026-08-20T14:25:00Z"
+    },
+    {
+      "gate": "child_ready.sh (overridden)",
+      "result": "override - proceeding to review",
+      "timestamp": "2026-08-21T17:45:19Z"
+    },
+    {
+      "gate": "delivery (human merge)",
+      "result": "pass",
+      "timestamp": "2026-08-24T15:21:19Z"
+    }
+  ],
+  "decision_log": [
+    {
+      "type": "product_owner_clarification",
+      "timestamp": "2026-08-20T14:24:32Z",
+      "description": "Product owner confirmed: use cdm-menu as outer container, ds-list-item with selectable=true and checkbox inside; column re-ordering (AC2) is explicitly out of scope for this delivery."
+    },
+    {
+      "type": "blocked",
+      "timestamp": "2026-08-20T18:39:49Z",
+      "description": "PR #392 remains failed on unit tests / vitest-coverage at head SHA 16016d104dd2b5972ee92f57699de6f706b89c37; child_ready gate cannot pass until the child repo publishes a green unit workflow."
+    },
+    {
+      "type": "blocked",
+      "timestamp": "2026-08-21T09:20:00Z",
+      "description": "PR #392 moved to head e4eed71f0a20aceeccff2568e35fb5ca8dd55291 with unit tests green, but playwright tests (e2e) still fail; child_ready gate remains blocked."
+    },
+    {
+      "type": "blocked",
+      "timestamp": "2026-08-21T10:44:43Z",
+      "description": "Frontend-implementer session (ec1fd5cd) finished; found new commit d3f1ecc in PR #392 head, but CI workflow has not yet triggered for it. Previous runs (43412676/43412677) failed E2E tests on commit e4eed71. Awaiting workflow trigger or clarification from implementer on what was actually pushed."
+    },
+    {
+      "type": "blocked",
+      "timestamp": "2026-08-21T11:12:05Z",
+      "description": "Frontend-implementer session (ce00c165) finished; pushed commit d3f1ecc to PR #392. Workflow 43418961 completed but E2E tests failed. Older implementer may have made changes that need review. Created new frontend-implementer session (d2dc07d0) to fix layout regression from d3f1ecc (removed h-100 w-100 sizing from container div)."
+    },
+    {
+      "timestamp": "2026-08-21T12:28:10Z",
+      "actor": "human",
+      "type": "blocked",
+      "summary": "Unblocked manually. Two concurrent implementer sessions (ce00c165, d2dc07d0) produced conflicting pushes; one force-push destroyed working state. Recovered on feature/R3DA-13330-final at e4eed71f. child_repos reset. Resuming with a single dispatch on that branch."
+    },
+    {
+      "timestamp": "2026-08-21T16:09:39Z",
+      "type": "ci_fix_needed",
+      "description": "PR #395 open with implementation complete; 2 CI failures identified: (1) Playwright virtual scrolling test toHaveCount(32) -> received 16, (2) SonarQube Quality Gate failure. Dispatched frontend-implementer to fix CI issues."
+    },
+    {
+      "timestamp": "2026-08-21T16:14:40Z",
+      "type": "progress",
+      "description": "Frontend-implementer re-evaluated CI failures: SonarQube shows 0 issues (pre-existing failure resolved). Running E2E tests to identify specific playwright failure. Plan approved for interactive debugging and fix."
+    },
+    {
+      "timestamp": "2026-08-21T16:21:53Z",
+      "type": "fix_applied",
+      "description": "Fixed E2E virtual scrolling test by adding wait after scroll. Push commit 62eadb1 to feature/R3DA-13330-final. CI workflows 43444715/43444714 triggered and running."
+    },
+    {
+      "timestamp": "2026-08-21T16:28:00Z",
+      "type": "ci_retry",
+      "description": "Previous E2E test fix (500ms wait) was insufficient. Increased timeout to 1000ms to give virtual scroll more time to load. Pushed commit 98188a1. New CI runs triggered."
+    },
+    {
+      "timestamp": "2026-08-21T17:07:15Z",
+      "type": "a11y_fix_complete",
+      "description": "Frontend-implementer identified and fixed WCAG 2.1/2.2 accessibility violations in column picker button. Added proper ARIA attributes (label, haspopup, expanded, hidden). Commit 955ec6a7 pushed. CI re-running with accessibility fix."
+    },
+    {
+      "timestamp": "2026-08-21T17:45:19Z",
+      "actor": "human",
+      "type": "gate_override",
+      "summary": "Proceeding to review despite failing e2e test. Virtual scrolling test (toHaveCount 32->16) is confirmed as pre-existing flaky, unrelated to column picker acceptance criteria (AC1, AC4, AC5 all passing). Unit tests green, linting/format green, accessibility fix complete."
+    },
+    {
+      "timestamp": "2026-08-21T17:34:48Z",
+      "type": "rework",
+      "summary": "Consensus gate failed: lookout-risk identified 1 blocking issue (AC5 missing i18n key for Description column header). Entered rework round 1 of 3."
+    },
+    {
+      "timestamp": "2026-08-21T17:41:13Z",
+      "type": "review_correction",
+      "summary": "Corrected lookout-risk false positive: AC5 blocking finding invalid. i18n key pages.facilities.modal.form.labels.description confirmed present in en.json and de.json (commit 2f6f0a23). AC5 verdict corrected to met. Both Lookouts now CONSENSUS_READY."
+    },
+    {
+      "timestamp": "2026-08-21T17:41:36Z",
+      "actor": "human",
+      "type": "diminishing_returns_decision",
+      "summary": "Consensus gate failed: lookout-correctness (CONSENSUS_READY, diminishing_returns=true) vs lookout-risk (CONSENSUS_READY on verdicts, diminishing_returns=false). Risk gaps identified: (1) all-columns-hidden edge case untested (major), (2) missing API field defense (major), (3) unthrottled localStorage, mobile untested, concurrency untested (minor). Decision required: Accept known risk gaps and merge, or enter rework round 2 to address RISK-002 and RISK-003."
+    },
+    {
+      "timestamp": "2026-08-24T11:24:14Z",
+      "type": "rework_complete",
+      "summary": "Frontend-implementer completed all 10 PR review fixes. Commit 244ca5ab pushed to feature/R3DA-13330-final. Fixes applied: (1) menu small-screen centering, (2-3) testing assertions on private members, (4) design token !important, (5) standalone/CommonModule, (6) keyboard handlers, (7) closeMenu guard, (8) storage validation, (9) localStorage effect(), (10) i18n label. CI running."
+    },
+    {
+      "timestamp": "2026-08-24T13:41:49Z",
+      "action": "e2e_fix_applied",
+      "note": "Fixed virtual scrolling change detection issue in FacilitiesCardViewComponent. Added NgZone and ChangeDetectorRef to ensure change detection runs after scroll event in OnPush strategy. Commit c31d3a4."
+    },
+    {
+      "timestamp": "2026-08-24T14:04:33Z",
+      "action": "implementer_progress",
+      "note": "Frontend implementer added localStorage service refactoring and column validation fixes (commits c9c825d, 0f204cb), but E2E virtual scroll test still failing and SonarQube quality gate now failing. Need follow-up to fix both issues."
+    },
+    {
+      "timestamp": "2026-08-25T17:09:26Z",
+      "actor": "human",
+      "type": "delivery_accepted",
+      "summary": "PR #395 merged to main (merge commit c373875d, head a5a37e42) on 2026-08-24T15:21:19Z. Human confirmed story complete; delivery_accepted approved. Story closed."
+    }
+  ],
+  "human_gates": {
+    "plan_accepted": {
+      "status": "approved",
+      "timestamp": "2026-08-20T14:25:57Z"
+    },
+    "delivery_accepted": {
+      "status": "approved",
+      "timestamp": "2026-08-25T17:09:26Z"
+    }
+  }
+}

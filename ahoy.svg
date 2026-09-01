@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" width="1200" height="470" role="img" aria-labelledby="t d">
+    <title id="t">Ahoy — the R3DA delivery control plane</title>
+    <desc id="d">Seven delivery phases from intake to done. Each transition is guarded by a gate script or an explicit human decision. Navigator handles intake, Cartographer plans, child repository agents implement, and two independent Lookouts review.</desc>
+
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0d1b2a"/>
+            <stop offset="100%" stop-color="#132a3e"/>
+        </linearGradient>
+        <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 1 L9 5 L1 9" fill="none" stroke="#5b7288" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <style>
+            .ttl  { font: 600 30px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#e8eef4 }
+            .sub  { font: 400 14px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#8ba0b4 }
+            .ph   { font: 600 13px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#e8eef4 }
+            .act  { font: 400 11px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#8ba0b4 }
+            .gate { font: 500 10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; fill:#0d1b2a }
+            .lg   { font: 400 12px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#8ba0b4 }
+            .rule { font: 400 13px ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; fill:#a8bccd }
+        </style>
+    </defs>
+
+    <rect width="1200" height="470" rx="14" fill="url(#bg)"/>
+
+    <!-- header -->
+    <g transform="translate(50,58)">
+        <g transform="translate(2,-2)">
+            <path d="M11 -16 L11 6" stroke="#4cc9c0" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M12 -15 L22 2 L12 2 Z" fill="#4cc9c0"/>
+            <path d="M10 -11 L2 2 L10 2 Z" fill="#4cc9c0" opacity="0.6"/>
+            <path d="M0 3 L22 3 L18 9 L4 9 Z" fill="#4cc9c0"/>
+        </g>
+        <text class="ttl" x="36" y="8">Ahoy</text>
+        <text class="sub" x="36" y="30">Delivery control plane — every phase looked up, every transition gated</text>
+    </g>
+
+    <!-- pipeline -->
+    <g transform="translate(0,150)">
+
+        <g>
+            <rect x="50" y="0" width="140" height="66" rx="9" fill="#173248" stroke="#4cc9c0" stroke-width="1.5"/>
+            <text class="ph" x="120" y="28" text-anchor="middle">intake</text>
+            <text class="act" x="120" y="47" text-anchor="middle">Navigator</text>
+        </g>
+        <line x1="194" y1="33" x2="212" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="220" y="0" width="140" height="66" rx="9" fill="#173248" stroke="#4cc9c0" stroke-width="1.5"/>
+            <text class="ph" x="290" y="28" text-anchor="middle">planning</text>
+            <text class="act" x="290" y="47" text-anchor="middle">Cartographer</text>
+        </g>
+        <line x1="364" y1="33" x2="382" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="390" y="0" width="140" height="66" rx="9" fill="#2b2418" stroke="#f4a259" stroke-width="1.5"/>
+            <text class="ph" x="460" y="28" text-anchor="middle">plan review</text>
+            <text class="act" x="460" y="47" text-anchor="middle">you approve</text>
+        </g>
+        <line x1="534" y1="33" x2="552" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="560" y="0" width="140" height="66" rx="9" fill="#173248" stroke="#4cc9c0" stroke-width="1.5"/>
+            <text class="ph" x="630" y="28" text-anchor="middle">implementation</text>
+            <text class="act" x="630" y="47" text-anchor="middle">child repo agents</text>
+        </g>
+        <line x1="704" y1="33" x2="722" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="730" y="0" width="140" height="66" rx="9" fill="#173248" stroke="#4cc9c0" stroke-width="1.5"/>
+            <text class="ph" x="800" y="28" text-anchor="middle">pr review</text>
+            <text class="act" x="800" y="47" text-anchor="middle">two Lookouts</text>
+        </g>
+        <line x1="874" y1="33" x2="892" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="900" y="0" width="140" height="66" rx="9" fill="#2b2418" stroke="#f4a259" stroke-width="1.5"/>
+            <text class="ph" x="970" y="28" text-anchor="middle">delivery gate</text>
+            <text class="act" x="970" y="47" text-anchor="middle">you approve</text>
+        </g>
+        <line x1="1044" y1="33" x2="1062" y2="33" stroke="#5b7288" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <g>
+            <rect x="1070" y="0" width="80" height="66" rx="9" fill="#1c2733" stroke="#5b7288" stroke-width="1.5"/>
+            <text class="ph" x="1110" y="37" text-anchor="middle">done</text>
+        </g>
+    </g>
+
+    <!-- gates -->
+    <g transform="translate(0,246)">
+        <line x1="120" y1="0" x2="120" y2="14" stroke="#33506a" stroke-width="1.2"/>
+        <rect x="66" y="14" width="108" height="20" rx="10" fill="#4cc9c0"/>
+        <text class="gate" x="120" y="28" text-anchor="middle">intake.sh</text>
+
+        <line x1="290" y1="0" x2="290" y2="14" stroke="#33506a" stroke-width="1.2"/>
+        <rect x="240" y="14" width="100" height="20" rx="10" fill="#4cc9c0"/>
+        <text class="gate" x="290" y="28" text-anchor="middle">plan.sh</text>
+
+        <line x1="630" y1="0" x2="630" y2="14" stroke="#33506a" stroke-width="1.2"/>
+        <rect x="546" y="14" width="168" height="20" rx="10" fill="#4cc9c0"/>
+        <text class="gate" x="630" y="28" text-anchor="middle">child_ready.sh · pr.sh</text>
+
+        <line x1="800" y1="0" x2="800" y2="14" stroke="#33506a" stroke-width="1.2"/>
+        <rect x="734" y="14" width="132" height="20" rx="10" fill="#4cc9c0"/>
+        <text class="gate" x="800" y="28" text-anchor="middle">consensus.sh</text>
+    </g>
+
+    <!-- rule -->
+    <text class="rule" x="50" y="332">No agent declares its own success. Every transition is a passing gate script or an explicit human decision.</text>
+
+    <!-- legend -->
+    <g transform="translate(50,372)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="#173248" stroke="#4cc9c0" stroke-width="1.5"/>
+        <text class="lg" x="20" y="10">agent phase</text>
+
+        <rect x="120" y="0" width="12" height="12" rx="3" fill="#2b2418" stroke="#f4a259" stroke-width="1.5"/>
+        <text class="lg" x="140" y="10">human decision</text>
+
+        <rect x="258" y="0" width="12" height="12" rx="3" fill="#4cc9c0"/>
+        <text class="lg" x="278" y="10">gate script — exit 0 pass · 1 fail · 2 environment error</text>
+
+        <rect x="620" y="0" width="12" height="12" rx="3" fill="#1c2733" stroke="#5b7288" stroke-width="1.5"/>
+        <text class="lg" x="640" y="10">terminal</text>
+    </g>
+
+    <text class="lg" x="1150" y="382" text-anchor="end">state: specs/&lt;STORY-ID&gt;/state.json</text>
+
+    <!-- the sea, and a small vessel making steady progress through the gates -->
+    <g opacity="0.85">
+        <path d="M50 428 q22 -7 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"
+              fill="none" stroke="#2a4763" stroke-width="2" stroke-linecap="round"/>
+        <path d="M50 440 q22 -7 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"
+              fill="none" stroke="#22394f" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- vessel, positioned at the implementation phase because that is where the weather is -->
+    <g transform="translate(596,392)">
+        <path d="M14 -30 L14 -4" stroke="#e8eef4" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M15 -29 L27 -6 L15 -6 Z" fill="#4cc9c0"/>
+        <path d="M13 -24 L3 -6 L13 -6 Z" fill="#4cc9c0" opacity="0.55"/>
+        <path d="M-2 -4 L30 -4 L25 6 L3 6 Z" fill="#e8eef4"/>
+        <path d="M14 -34 a3 3 0 1 1 0.01 0" fill="#f4a259"/>
+    </g>
+    <text class="lg" x="640" y="404" opacity="0.75">rough seas here</text>
+
+    <!-- gull, unimpressed, waiting at the merge -->
+    <g transform="translate(1096,138)" opacity="0.9">
+        <path d="M0 0 q5 -6 10 0 q5 -6 10 0" fill="none" stroke="#8ba0b4" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(1064,150)" opacity="0.7">
+        <path d="M0 0 q3.5 -4 7 0 q3.5 -4 7 0" fill="none" stroke="#8ba0b4" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+</svg>

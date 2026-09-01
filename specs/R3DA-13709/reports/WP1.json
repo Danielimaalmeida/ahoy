@@ -1,0 +1,46 @@
+{
+  "work_package_id": "WP1",
+  "repo": "backend",
+  "repo_slug": "qwerty/r3da_cdm_backend",
+  "branch": "feature/R3DA-13709-sas-attributes-eplan",
+  "head_sha": "ad459ba4e5ea766645908d7d1b7086f25f0ae2f7",
+  "status": "ready",
+  "acceptance_criteria_mapping": {
+    "AC1": "POST /v2/electrical-structures/{masterString}/eplan accepts SAS payloads carrying non-ARTICLE node attributes via SASPartDTO.attributes and persists them through SASPartMapper while keeping child hierarchy intact; proven by uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren in src/test/java/com/asd/ito/integration/electrical/structure/ElectricalStructureResourceIT.java with fixture src/test/resources/eplan/3DF5MBG24/sas_v8_attributes.json.",
+    "AC2": "SASPartMapper writes attributes from SAS attributes into the existing generic node attributes store and preserves children for nodes carrying attributes; implemented in src/main/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapper.java and proven by toElectricalPartMapsAttributesAsNodePropertiesForNonArticleNodes plus toElectricalPartPreservesChildrenWhenAttributesArePresent in src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java.",
+    "AC3": "Mapper precedence is attributes > articleData > unattributed node; implemented in resolveNodeAttributes/toElectricalPart in src/main/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapper.java and proven by toElectricalPartPrefersAttributesOverArticleDataWhenBothPresent, toElectricalPartFallsBackToArticleDataWhenAttributesAbsent, and toElectricalPartLeavesNodeUnattributedWhenNeitherPropertyPresent in src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java."
+  },
+  "test_ids_delivered": {
+    "uploadSasFileWithAttributesShouldStoreNonArticleNodePropertiesAndPreserveChildren": "src/test/java/com/asd/ito/integration/electrical/structure/ElectricalStructureResourceIT.java",
+    "toElectricalPartMapsAttributesAsNodePropertiesForNonArticleNodes": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartPreservesChildrenWhenAttributesArePresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartPrefersAttributesOverArticleDataWhenBothPresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartFallsBackToArticleDataWhenAttributesAbsent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "toElectricalPartLeavesNodeUnattributedWhenNeitherPropertyPresent": "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java"
+  },
+  "changed_files": [
+    "src/main/java/com/asd/ito/dtos/electrical/structure/sas/SASPartDTO.java",
+    "src/main/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapper.java",
+    "src/test/java/com/asd/ito/integration/electrical/structure/ElectricalStructureResourceIT.java",
+    "src/test/java/com/asd/ito/service/file/FacilityFileServiceTest.java",
+    "src/test/java/com/asd/ito/service/mappers/electrical/structure/sas/SASPartMapperTest.java",
+    "src/test/resources/eplan/3DF5MBG24/sas_v8_attributes.json"
+  ],
+  "validation_commands": [
+    {
+      "command": "rtk ./mvnw test",
+      "result": "passed (BUILD SUCCESS, 817 tests, 0 failures)"
+    },
+    {
+      "command": "rtk ./mvnw verify -DskipITs=false",
+      "result": "passed (BUILD SUCCESS, unit + integration suites, 0 failures)"
+    },
+    {
+      "command": "rtk ./mvnw checkstyle:check",
+      "result": "passed (BUILD SUCCESS, 0 violations)"
+    }
+  ],
+  "remaining_gaps": [],
+  "rework_note": "Re-open note investigated first: no Angular/template files or #resizer references exist in this backend repository; WP1 backend acceptance criteria implementation remains intact and validated.",
+  "assumption_check": "No unresolved assumptions remain."
+}
