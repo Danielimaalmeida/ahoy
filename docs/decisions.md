@@ -25,15 +25,20 @@ except the one fix recorded below, and the gates are invoked with the same
 argv, the same environment, and the same exit code read and routed on
 unchanged.
 
-`bin/serve.py` was deliberately left alone. Changing two layers at once means a
-failure afterwards is ambiguous about which layer caused it.
+The port ran in two passes. The first moved the ten harness scripts and left
+`bin/serve.py` alone deliberately — changing two layers at once means a failure
+afterwards is ambiguous about which layer caused it. The second, once the
+harness was green, removed Python entirely: `serve.py` became `serve.js`, and
+`credits.js` stopped shelling out to `python3`. Both are recorded below.
 
 ### Constraints this port had to hold
 
 - **Node standard library only.** No dependencies, no build step, no
   TypeScript. These run on locked-down work laptops where `npm install` is not
   a step anyone can rely on. There is no `package.json`, so the harness is plain
-  CommonJS and there is nothing to configure.
+  CommonJS and there is nothing to configure. Where the standard library had no
+  answer — a pty — the port reached for a POSIX command that was already on the
+  machine rather than a package.
 - **`state.json` keeps its exact shape.** Every field in the child dispatch
   contract's "Schema additions" is untouched. A running story survives the port
   with no migration — [tests/cases/state-shape.test.js](/tests/cases/state-shape.test.js)
@@ -48,12 +53,18 @@ failure afterwards is ambiguous about which layer caused it.
 
 Every `bin/x.sh` is now two lines that `exec node .../x.js "$@"`.
 
-They are not politeness. `bin/serve.py` invokes these scripts by path —
-`ROOT / "bin" / "approve.sh"` — and runs `tick.sh` under a pty to stream the
-router into the browser. Keeping the names meant the UI, every runbook, every
-cron entry and everyone's muscle memory needed no change, and `serve.py` stayed
-literally untouched. `exec` matters beyond tidiness for `tick.sh`: the process
-the UI signals has to be the router itself, not a shell holding its hand.
+They are not politeness. The UI server invokes these scripts by path and runs
+`tick.sh` under a pty to stream the router into the browser. Keeping the names
+meant every runbook, every cron entry and everyone's muscle memory needed no
+change — and during the first pass it meant `serve.py` needed no edit at all,
+which is what let the two layers move separately. `exec` matters beyond tidiness
+for `tick.sh`: the process the UI signals has to be the router itself, not a
+shell holding its hand.
+
+`bin/serve.sh` is the one shim that is not a rename of an existing `.sh` — the
+UI server was `bin/serve.py`, so its command name changed. README.md and
+docs/setup.md were updated; it is the only command in the repository whose name
+this port altered.
 
 ### What moved into `bin/lib/`
 
@@ -65,16 +76,84 @@ header says a second copy of the URL-building logic had already drifted once.
 
 There is now one of each, in `bin/lib/`, and the tests import them.
 
-### `credits.js` still shells out to `python3`
+### The usage ledger is read with `node:sqlite`
 
-The Copilot usage ledger is a SQLite database. Node's own `node:sqlite` is
-experimental and flag-gated on the Node 22 these laptops have, so using it would
-have traded a working read for a warning and a runtime flag.
+The Copilot usage ledger is a SQLite database, and reading it was a `python3`
+subprocess — first inside `credits.sh`, then carried across the first pass
+unchanged.
 
-The read was already a `python3` subprocess inside `credits.sh`, so keeping it
-adds no dependency that was not there before. It is the same division as
-everywhere else here: something else asks the awkward question, and JavaScript
-decides what to do with the answer.
+The reason recorded for keeping it was **wrong**: `node:sqlite` was described as
+flag-gated on Node 22, which was true early in the 22 series and is not true of
+the 22.22 these laptops run. It loads unflagged and prints an experimental
+warning.
+
+So the ledger is read with `node:sqlite`, and Python left the harness with it.
+The read still goes via a **copy** of the database, including its `-wal`: the
+CLI writes it from another process, and it is not ours to lock, upgrade or
+checkpoint.
+
+Two live caveats:
+
+- It raises the project's Node floor to **22.5**. Everything else runs on 18.
+- It is still experimental upstream, so the API could change.
+
+Both land in the same place as a missing ledger — a message and exit 0 — because
+bookkeeping that can stop a delivery is worse than bookkeeping that is
+occasionally incomplete. An old Node costs the credits panel, not the story.
+
+The experimental warning is filtered inside `credits.js` and nowhere else. It is
+not actionable by whoever is asking what a story cost, and it would otherwise
+print on every `credits show`. The caveat lives here instead, where it can be
+acted on.
+
+---
+
+## `bin/serve.py` is now `bin/serve.js`, and the pty comes from `script(1)`
+
+The UI server was the last Python. Porting it hit one real obstacle: **Node's
+standard library has no pty**, and the interactive panel is built on one.
+
+That panel is not a nicety. `phases.tsv` marks `planning` interactive precisely
+so cartographer can ask questions, and the router hands it a real terminal. A
+pipe would make the phase look unattended, and under `--no-ask-user` an
+unanswerable question becomes a silent denial rather than a prompt. Python had
+`pty.openpty()` in its standard library; Node has nothing equivalent, and
+`node-pty` is a compiled dependency this repository will not take — these run on
+locked-down laptops where `npm install` is not a step anyone can rely on.
+
+`script(1)` allocates a pty and runs a command inside it. It is POSIX, ships
+with macOS and every Linux, and a child under it reports `isTTY: true` — which
+is exactly what the router checks. The two flavours differ only in how the
+command is passed:
+
+```
+util-linux   script -q -e -c '<command>' /dev/null
+BSD/macOS    script -q /dev/null sh -c '<command>'
+```
+
+`stty -echo` runs as the first command inside the pty, replacing the `termios`
+call Python made on the slave before spawning. A real terminal echoes what you
+type because you are looking at it; here the browser is, and the transcript
+marks your lines with `> ` itself. Left on, every answer appears twice and the
+second copy is indistinguishable from something the agent said. Nothing can be
+typed before the session starts, so there is no window in which the echo is
+still on and input could arrive.
+
+If `script` is missing the server starts anyway and says so. Only the browser's
+planning sessions are affected; the terminal path never needed it.
+
+### What else changed in the server
+
+- It reads the phase table through `bin/lib/table.js`, the same parser the
+  router uses, so the page and the harness cannot disagree about what a phase
+  is. `serve.py` had its own copy.
+- Required as a module it binds no port, which is how it acquired tests. There
+  were none before: `tests/cases/serve.test.js` now covers `gateDecision` — the
+  function whose earlier version greyed out the buttons for every story it was
+  meant to serve — the reopen derivation, and both path-traversal guards.
+- It still invokes the `.sh` shims rather than the `.js` behind them. The
+  `command` string in each response is what the page shows the operator, and it
+  has to be something they can paste — which is the name every runbook uses.
 
 ### `readLineFromTTY` replaces `read -r x < /dev/tty`
 

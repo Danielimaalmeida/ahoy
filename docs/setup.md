@@ -51,22 +51,33 @@ uname -s              # must print Linux or Darwin
 command -v node bash  # both must resolve inside WSL
 ```
 
-**Node 18 or newer**, for the harness under `bin/`. Standard library only — no
-dependencies, no build step, no `package.json`, nothing to `npm install`. You
-already have it if you installed the Copilot CLI, which is an npm package.
+**Node 22.5 or newer**, for the harness under `bin/` and the web UI. Standard
+library only — no dependencies, no build step, no `package.json`, nothing to
+`npm install`. You already have it if you installed the Copilot CLI, which is an
+npm package.
 
 ```bash
-node --version    # v18.0.0 or newer
+node --version    # v22.5.0 or newer
 ```
+
+Everything except credits works on Node 18. The floor is 22.5 because
+`bin/credits.js` reads the Copilot usage ledger with `node:sqlite`. On an older
+Node it says so and records nothing, rather than failing a delivery over
+bookkeeping — so an out-of-date Node costs you the credits panel, not the story.
 
 **`jq`, `git`, `gh`.** All three, with `gh` authenticated to our Enterprise host.
 `jq` is still required: every gate under `gates/` uses it, so a machine without
 it cannot enforce the gates whatever the router is written in.
 
-**Python 3**, for the web UI (`bin/serve.py`) and for reading the Copilot usage
-ledger in `bin/credits.js`, which is a SQLite database. Standard library only —
-nothing to install beyond the interpreter, which macOS and WSL already have. The
-terminal path needs it only for credits, and a missing ledger is never fatal.
+**`script(1)`**, for the web UI's interactive panel. Node's standard library has
+no pty, and `planning` hands cartographer a real terminal so it can ask you
+questions — so the server runs the router under `script`, which allocates one.
+It ships with macOS and with every Linux (util-linux); nothing to install. The
+terminal path does not need it. Without it the server starts and says so, and
+only the browser's planning sessions are affected.
+
+**No Python.** It used to be needed for the UI server and the usage ledger;
+both are Node now.
 
 **SSH access to the Enterprise host.** The harness clones over SSH by default.
 HTTPS goes through whatever credential helper answers first — on macOS usually a
@@ -251,7 +262,7 @@ here; the harness reads the profile and grants what it asks for.
 One command.
 
 ```bash
-bin/serve.py
+bin/serve.sh
 ```
 
 Open <http://127.0.0.1:8765>, press **+ New story**, and type the Jira key. The

@@ -31,12 +31,16 @@
 // their own session ids we never chose, but they run in the worktree we made.
 // Both may be given; they union, and the keying makes the overlap harmless.
 //
-// THE LEDGER IS STILL READ BY PYTHON. It is a SQLite database, and Node's own
-// sqlite module is experimental and flag-gated on the Node 22 these laptops
-// have. The read was already a python3 subprocess inside the bash, so keeping it
-// adds no dependency that was not there this morning — and it is the same
-// division as everywhere else here: something else asks the awkward question,
-// and JavaScript decides what to do with the answer.
+// THE LEDGER IS READ WITH `node:sqlite`. It is a SQLite database, and reading
+// it used to be a python3 subprocess — first inside the bash, then carried
+// across the port unchanged. `node:sqlite` is standard library, so that was the
+// last thing keeping Python in the harness.
+//
+// It is still marked experimental upstream, which is a real caveat: it needs
+// Node 22.5 or newer, and the API could change. Both failure modes land in the
+// same place as a missing ledger — a warning and exit 0 — because bookkeeping
+// that can stop a delivery is worse than bookkeeping that is occasionally
+// incomplete.
 //
 // Exit codes:
 //   0 recorded (including "nothing to record" — an agent that burned nothing is
@@ -49,6 +53,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { root, statePath, err, out, die, haveCommand } = require('./lib/cli');
 const state = require('./lib/state');
+// `spawnSync` is still used by `backfill`, which re-invokes this script per
+// session and per worktree so each record goes through the same merge.
 
 const ROOT = root();
 const LEDGER = process.env.HARNESS_USAGE_DB
@@ -164,80 +170,92 @@ if (!fs.existsSync(LEDGER)) {
 }
 
 // ------------------------------------------------------------- read the ledger
-// Read-only and via a copy: the CLI writes this database from another process,
-// and it is not ours to lock, upgrade, or checkpoint. Copying the -wal alongside
-// it keeps the reader consistent with what has been committed.
-const READER = `
-import json, os, shutil, sqlite3, tempfile
+//
+// Read via a COPY: the CLI writes this database from another process, and it is
+// not ours to lock, upgrade, or checkpoint. Copying the -wal alongside it keeps
+// the reader consistent with what has been committed.
+//
+// `node:sqlite` announces itself as experimental on every load. That warning is
+// not actionable by whoever is asking what a story cost, and it would print on
+// every `credits show`, so it is filtered here and nowhere else — the caveat is
+// recorded in docs/decisions.md instead, where it can be acted on.
+function loadSqlite() {
+  const emit = process.emitWarning;
+  process.emitWarning = (warning, ...rest) => {
+    if (String(warning).includes('SQLite is an experimental feature')) return;
+    return emit.call(process, warning, ...rest);
+  };
+  try {
+    return require('node:sqlite');
+  } catch {
+    // Node older than 22.5, or a build without it. Same outcome as a missing
+    // ledger: say so, record nothing, and never fail the delivery.
+    return null;
+  } finally {
+    process.emitWarning = emit;
+  }
+}
 
-ledger = os.environ["HARNESS_LEDGER"]
-session = os.environ.get("HARNESS_SESSION") or ""
-cwd = os.environ.get("HARNESS_CWD") or ""
-since = os.environ.get("HARNESS_SINCE") or ""
-
-tmp = tempfile.mkdtemp(prefix="ahoy-credits-")
-try:
-    copy = os.path.join(tmp, "ledger.db")
-    shutil.copy2(ledger, copy)
-    for ext in ("-wal", "-shm"):
-        if os.path.exists(ledger + ext):
-            shutil.copy2(ledger + ext, copy + ext)
-
-    db = sqlite3.connect(copy)
-    clauses, args = [], []
-    if session:
-        clauses.append("s.id = ?")
-        args.append(session)
-    if cwd:
-        clauses.append("(s.cwd = ? AND s.created_at >= ?)")
-        args += [cwd.rstrip("/"), since]
-
-    rows = db.execute(
-        """
-        SELECT s.id,
-               COALESCE(SUM(u.total_nano_aiu), 0) / 1e9,
-               COALESCE(SUM(u.input_tokens), 0),
-               COALESCE(SUM(u.output_tokens), 0),
-               COUNT(*),
-               (SELECT m.model FROM assistant_usage_events m
-                 WHERE m.session_id = s.id AND m.model IS NOT NULL
-                 ORDER BY m.turn_index DESC LIMIT 1)
-          FROM sessions s
-          JOIN assistant_usage_events u ON u.session_id = s.id
-         WHERE """ + " OR ".join(clauses) + """
-         GROUP BY s.id
-        """,
-        args,
-    ).fetchall()
-
-    print(json.dumps([
-        {"session": r[0], "aiu": round(r[1], 6), "input_tokens": r[2],
-         "output_tokens": r[3], "turns": r[4], "model": r[5]}
-        for r in rows
-    ]))
-finally:
-    shutil.rmtree(tmp, ignore_errors=True)
-`;
+const SQL = `
+  SELECT s.id                                        AS session,
+         COALESCE(SUM(u.total_nano_aiu), 0) / 1e9    AS aiu,
+         COALESCE(SUM(u.input_tokens), 0)            AS input_tokens,
+         COALESCE(SUM(u.output_tokens), 0)           AS output_tokens,
+         COUNT(*)                                    AS turns,
+         (SELECT m.model FROM assistant_usage_events m
+           WHERE m.session_id = s.id AND m.model IS NOT NULL
+           ORDER BY m.turn_index DESC LIMIT 1)       AS model
+    FROM sessions s
+    JOIN assistant_usage_events u ON u.session_id = s.id
+   WHERE __WHERE__
+   GROUP BY s.id`;
 
 function readLedger() {
-  const r = spawnSync('python3', ['-'], {
-    input: READER,
-    encoding: 'utf8',
-    stdio: ['pipe', 'pipe', 'ignore'],   // 2>/dev/null: a broken ledger is not a failed delivery
-    env: {
-      ...process.env,
-      HARNESS_LEDGER: LEDGER,
-      HARNESS_SESSION: opts.session,
-      HARNESS_CWD: opts.cwd,
-      HARNESS_SINCE: opts.since,
-    },
-  });
-  if (r.status !== 0 || !r.stdout) return [];
-  try {
-    const parsed = JSON.parse(r.stdout);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  const sqlite = loadSqlite();
+  if (!sqlite) {
+    err('credits: this Node has no node:sqlite (needs 22.5+); nothing recorded');
     return [];
+  }
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ahoy-credits-'));
+  let db;
+  try {
+    const copy = path.join(tmpDir, 'ledger.db');
+    fs.copyFileSync(LEDGER, copy);
+    for (const ext of ['-wal', '-shm']) {
+      if (fs.existsSync(LEDGER + ext)) fs.copyFileSync(LEDGER + ext, copy + ext);
+    }
+
+    // Either-or attribution, unioned. --session names the one we pinned; --cwd
+    // with --since sweeps the worktree, which is how a child dispatch catches
+    // the subagents its specialist spawned. Keying by session makes the overlap
+    // harmless.
+    const clauses = [];
+    const args = [];
+    if (opts.session) { clauses.push('s.id = ?'); args.push(opts.session); }
+    if (opts.cwd) {
+      clauses.push('(s.cwd = ? AND s.created_at >= ?)');
+      args.push(opts.cwd.replace(/\/+$/, ''), opts.since);
+    }
+
+    db = new sqlite.DatabaseSync(copy);
+    const rows = db.prepare(SQL.replace('__WHERE__', clauses.join(' OR '))).all(...args);
+    return rows.map((r) => ({
+      session: r.session,
+      aiu: Math.round(Number(r.aiu) * 1e6) / 1e6,
+      input_tokens: Number(r.input_tokens),
+      output_tokens: Number(r.output_tokens),
+      turns: Number(r.turns),
+      model: r.model ?? null,
+    }));
+  } catch (e) {
+    // A ledger that has not flushed yet, or whose schema has moved on, is not a
+    // failed delivery. Say what happened and record nothing.
+    err(`credits: could not read the usage ledger (${e.message}); nothing recorded`);
+    return [];
+  } finally {
+    try { if (db) db.close(); } catch { /* already closed */ }
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 

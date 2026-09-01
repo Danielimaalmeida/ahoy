@@ -11,10 +11,10 @@ Shared agentic AI workspace for the software development team. This repository i
 One command.
 
 ```sh
-bin/serve.py
+bin/serve.sh
 ```
 
-Open <http://127.0.0.1:8765>. Python standard library only — no build step, no
+Open <http://127.0.0.1:8765>. Node standard library only — no build step, no
 `npm install`, nothing to compile. `--port` and `--host` exist; there is no
 auth, so leave the host on localhost.
 
@@ -136,7 +136,7 @@ bin/revise.sh  R3DA-14022 plan -- "the frontend criteria miss the empty state"
 ### What the UI is not
 
 It is a second interface to the harness, not a second implementation of it.
-`bin/serve.py` reads `state.json` and `phases.tsv`; **it writes neither.** Every
+`bin/serve.js` reads `state.json` and `phases.tsv`; **it writes neither.** Every
 button shells out to the command above that already owned that decision, and
 each runs with `--no-continue` so a refusal comes back legible instead of
 disappearing into a request that blocks for the length of an agent run.
@@ -182,12 +182,11 @@ The exit-code contract, in full:
 ```text
 bin/                     The harness, in Node. tick.js (the router), run.js,
                          start.js, approve.js, revise.js, decide.js,
-                         dispatch.js, review.js, repo.js, credits.js.
-                         Each has a two-line .sh shim of the same name, so
-                         every existing caller still works
+                         dispatch.js, review.js, repo.js, credits.js,
+                         serve.js (the UI server). Each has a two-line .sh
+                         shim of the same name, so every caller still works
   lib/                   Shared harness code: state.json I/O, the phase table,
                          agent profiles, the repo mapping, derived values
-  serve.py               The UI server (Python, unchanged)
 web/                     The browser UI. Plain ES modules, no build step
 gates/                   Phase criteria as exit codes, in bash (process tooling,
                          not product code)
@@ -206,8 +205,10 @@ docs/decisions.md        Decisions and the failures that forced them
 work/                    Child-repository clones and per-story worktrees (gitignored)
 ```
 
-The harness uses the **Node standard library only** — no dependencies, no build
-step, no `package.json`. `gates/` needs `bash` and `jq`, as it always has.
+The harness and the UI server use the **Node standard library only** — no
+dependencies, no build step, no `package.json`. `gates/` needs `bash` and `jq`,
+as it always has, and the UI's interactive panel needs `script(1)` for a
+pseudo-terminal. There is no Python.
 
 Application code belongs in its owning repository. Child repositories remain
 authoritative for their own instructions, build configuration, tests, and

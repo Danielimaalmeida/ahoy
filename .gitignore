@@ -13,3 +13,4 @@ workspaces/*
 .playright-mcp/*
 ./work/*
 __pycache__/
+node_modules/

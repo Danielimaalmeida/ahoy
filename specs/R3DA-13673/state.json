@@ -386,6 +386,12 @@
       "actor": "tick",
       "type": "rework",
       "summary": "reopened frontend work packages: gate reported failing checks"
+    },
+    {
+      "timestamp": "2026-09-01T10:55:45Z",
+      "actor": "human",
+      "type": "human_approval",
+      "summary": "delivery_accepted approved at phase delivery_gate"
     }
   ],
   "human_gates": {
@@ -394,8 +400,8 @@
       "timestamp": "2026-08-31T12:57:54Z"
     },
     "delivery_accepted": {
-      "status": "pending",
-      "timestamp": null
+      "status": "approved",
+      "timestamp": "2026-09-01T10:55:45Z"
     }
   },
   "session_ids": {
