@@ -1,17 +1,38 @@
 /**
  * Reviewer verdicts - two models, two lenses, one criterion per row.
  *
- * The layout exists for one job: make disagreement impossible to miss. Where
- * the reviewers agree a criterion is unmet, that is work and the router can
- * handle it. Where they disagree, the story stops for a human, because sending
- * it to rework would tell a fixer to change something a competent reviewer says
- * is already correct. So a split row is coloured AND called out above the table
- * rather than left for you to spot by comparing two cells.
+ * The criterion is the unit of agreement, so it is the unit of layout. Two
+ * reviewer columns side by side means a split is a horizontal mismatch you can
+ * see without reading a word.
+ *
+ * WHERE THEY AGREE, there is nothing to decide: agreement that a criterion is
+ * unmet is work, and the router sends it to rework on its own. That screen
+ * opens by saying so, because three red rows look like a summons and are not
+ * one - and a person who cannot find the button that does not exist will go
+ * looking for it.
+ *
+ * WHERE THEY DISAGREE, the story has stopped and only a person can move it. So
+ * this is the one view in the app that breaks the page's reading order: the
+ * disputed criteria are lifted above the table, because they are the reason
+ * you were called and everything else is context for them. The banner is the
+ * only filled red surface in the product, reserved for exactly this so it can
+ * never be mistaken for a validation error.
+ *
+ * NEITHER REVIEWER IS RANKED. No "1 of 2 reviewers", no majority language, no
+ * ordering that puts one lens first. Ahoy must not imply a winner; the split is
+ * presented as a split.
+ *
+ * WHAT IS NOT HERE. There is no control to settle the disagreement. The
+ * harness has no verb for it - gates/consensus.sh exits 4, bin/tick.js stops
+ * without changing phase, and approve/revise/decide each own a different
+ * decision. A button here would be the browser deciding something no script
+ * owns, which is the failure this whole codebase is shaped to avoid. So the
+ * screen makes the split legible and says where the decision is actually made.
  *
  * Returns null when there are no reports.
  */
 import { el } from '../core/dom.js';
-import { panel, dataTable, badge, chip, muted } from '../core/ui.js';
+import { panel, dataTable, badge, chip, muted, callout, calloutTitle } from '../core/ui.js';
 import { words, list, statusClass, severityClass, shortSha } from '../core/format.js';
 
 export function reviewVerdicts(state) {
@@ -21,13 +42,19 @@ export function reviewVerdicts(state) {
   const rows = buildRows(state, reviews);
   const split = rows.filter((row) => row.split);
   const unmet = rows.filter((row) => row.agreed && row.agreed !== 'met');
+  const met = rows.filter((row) => row.agreed === 'met');
 
   return [
-    split.map((row) => splitCallout(row, reviews)),
-    unmet.length && unmetCallout(unmet),
-    panel({ title: `Reviewer verdicts · ${reviews.length} reports`,
-            aside: muted(reviewedShas(reviews)) },
-      verdictTable(rows, reviews)),
+    split.length ? haltBanner(split, unmet, met) : agreedBanner(unmet),
+    split.map((row) => disputeCard(row, reviews)),
+    split.length
+      ? el('details', {},
+        el('summary', { text: `The ${rows.length - split.length} criteria the reviewers agree on `
+          + `— ${met.length} met, ${unmet.length} unmet and bound for rework` }),
+        verdictTable(rows.filter((row) => !row.split), reviews))
+      : panel({ title: `Reviewer verdicts · ${reviews.length} reports`,
+                aside: muted(reviewedShas(reviews)) },
+        verdictTable(rows, reviews)),
     reviews.map(findingsPanel),
   ];
 }
@@ -62,44 +89,109 @@ function buildRows(state, reviews) {
   });
 }
 
+/** The halt. Filled red, and the only one in the product. */
+function haltBanner(split, unmet, met) {
+  return [
+    callout('halt',
+      calloutTitle(`The two reviewers disagree about ${split.length} `
+        + `${split.length === 1 ? 'criterion' : 'criteria'}. The story has stopped here.`),
+      el('p', { text: 'Ahoy will not send a fixer to change something one competent reviewer '
+        + 'already calls correct — that is a loop with no way out. Nothing moves, in either '
+        + 'direction, until a person says which reading holds.' })),
+    el('div', { class: 'halt-counts' },
+      el('span', {}, el('b', { text: String(split.length) }), ' disputed — waiting on you'),
+      el('span', {}, el('b', { text: String(unmet.length) }),
+        ' agreed unmet — goes to rework once the dispute is settled'),
+      el('span', {}, el('b', { text: String(met.length) }), ' agreed met')),
+  ];
+}
+
+/**
+ * The reviewers agree. Opens by saying nothing is being asked of you, because
+ * that is the fact a page full of red rows otherwise hides.
+ */
+function agreedBanner(unmet) {
+  if (!unmet.length) return null;
+  return callout('accent',
+    calloutTitle('Nothing is being asked of you. This is running.'),
+    el('p', { text: `Both reviewers say the same ${unmet.length} `
+      + `${unmet.length === 1 ? 'criterion is' : 'criteria are'} not met, so there is nothing to `
+      + 'settle. Agreement is not a judgement call — that is work, not a decision, and the '
+      + 'router routes it to rework on its own. You will be called back at the delivery gate.' }));
+}
+
+/**
+ * A disputed criterion, with each reviewer's reading beside the other.
+ *
+ * The schema records a verdict per criterion and nothing else - there is no
+ * field for why a reviewer reached it. Rather than leave an empty box or
+ * invent a rationale by grepping the findings for a criterion id, the card
+ * says plainly that the reasoning was not recorded and points at the full
+ * report, which is the honest version of what we actually have.
+ */
+function disputeCard(row, reviews) {
+  return el('div', { class: 'dispute' },
+    el('div', { class: 'dispute-head' },
+      el('span', { class: 'mono', text: row.id }),
+      el('span', { class: 'ac-text', text: row.text || '(this criterion is no longer in the plan)' }),
+      el('span', { class: 'dispute-tag', text: 'DISPUTED' })),
+    el('div', { class: 'dispute-sides' },
+      reviews.map((review, i) => side(review, row.verdicts[i], i))),
+  );
+}
+
+function side(review, verdict, index) {
+  const shas = Object.entries(review.reviewed_shas || {});
+
+  return el('div', { class: 'dispute-side' },
+    el('div', { class: 'dispute-who' },
+      verdict ? badge(statusClass(verdict), words(verdict)) : badge('b-mute', 'no verdict'),
+      el('b', { text: reviewerName(review, index) }),
+      muted(words(review.lens || ''))),
+    el('p', { class: 'muted', text: 'No per-criterion reasoning is recorded — state.json keeps a '
+      + 'verdict and no note against it. This reviewer’s full findings are below.' }),
+    shas.length && el('div', { class: 'dispute-files',
+      text: `read ${shas.map(([repo, sha]) => `${repo} @ ${shortSha(sha)}`).join(' · ')}` }),
+  );
+}
+
 function verdictTable(rows, reviews) {
   return dataTable({
-    columns: ['', ...reviews.map(reviewerHeading), ''],
+    columns: ['', 'criterion', ...reviews.map(reviewerHeading), 'what happens'],
     rows,
-    rowClass: (row) => ['verdict-row', row.split && 'split'],
+    rowClass: (row) => [
+      'verdict-row',
+      row.split && 'split',
+      row.agreed && row.agreed !== 'met' && 'unmet',
+    ],
     cells: (row) => [
-      [el('div', { class: 'mono', text: row.id }), row.text && muted(row.text)],
+      el('div', { class: 'mono', text: row.id }),
+      row.text ? el('div', { text: row.text }) : muted('(no longer in the plan)'),
       ...row.verdicts.map((verdict) => verdict
         ? badge(statusClass(verdict), words(verdict))
         : badge('b-mute', 'no verdict')),
-      row.split && el('span', { class: 'split-flag', text: 'they disagree' }),
+      consequence(row),
     ],
     empty: 'No criteria were reviewed.',
   });
 }
 
-function splitCallout(row, reviews) {
-  const said = row.verdicts
-    .map((verdict, i) => `${reviewerName(reviews[i], i)} `
-      + (verdict ? `says ${words(verdict)}` : 'gave no verdict'))
-    .join(' · ');
-
-  return el('div', { class: 'callout' },
-    el('h2', { text: `The reviewers disagree on ${row.id}` }),
-    row.text && el('p', { text: row.text }),
-    el('p', { text: said }),
-    el('p', { text: 'This is why the story stopped here. Sending it to rework would tell a '
-                  + 'fixer to change something a competent reviewer says is already correct — '
-                  + 'so the call is yours.' }),
-  );
-}
-
-function unmetCallout(rows) {
-  return el('div', { class: 'callout agreed' },
-    el('h2', { text: 'Both reviewers agree these are not met' }),
-    el('p', { text: rows.map((row) => `${row.id} (${words(row.agreed)})`).join(', ') }),
-    el('p', { text: 'Agreement is not a judgement call — that is work, not a decision.' }),
-  );
+/**
+ * The fifth column, and the point of the table. Verdicts are the input; what
+ * happens next is what the reader came for. A met row says "nothing" rather
+ * than being left blank - a blank cell reads as missing data.
+ */
+function consequence(row) {
+  if (row.split) {
+    return el('div', { class: 'v-consequence is-rework', text: 'waiting on you' });
+  }
+  if (row.agreed === 'met') {
+    return el('div', { class: 'v-consequence is-none', text: 'nothing' });
+  }
+  if (row.agreed) {
+    return el('div', { class: 'v-consequence is-rework', text: 'goes to rework' });
+  }
+  return el('div', { class: 'v-consequence is-none', text: 'not reviewed' });
 }
 
 function findingsPanel(review) {
@@ -131,7 +223,7 @@ function reviewerName(review, index = 0) {
 }
 
 function reviewerHeading(review) {
-  return el('div', {},
+  return el('div', { class: 'v-reviewer' },
     el('div', { text: review.model || 'unknown model' }),
     el('div', { class: 'muted', text: words(review.lens || '') }));
 }

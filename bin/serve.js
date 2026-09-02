@@ -210,6 +210,7 @@ function summarise(storyId, state, gatesByPhase, order) {
   const gate = gatesByPhase[phase] || null;
   const decided = gate ? gateDecision(state, gate.key) : null;
   const stamps = collectTimestamps(state);
+  const live = sessionFor(storyId);
   return {
     story_id: state.story_id || storyId,
     dir: storyId,
@@ -219,6 +220,11 @@ function summarise(storyId, state, gatesByPhase, order) {
     updated: stamps.length ? stamps.reduce((a, b) => (a > b ? a : b)) : null,
     // Awaiting a human means: at a human phase, with nothing recorded yet.
     awaiting: Boolean(gate && decided === null),
+    // Whether a router is attached right now. Without this the list cannot
+    // tell a story that is working from one whose terminal was closed hours
+    // ago: both report `implementation`, and only one of them is moving.
+    // Read-only, like everything else this server reports.
+    running: Boolean(live && !live.closed),
     gate,
     phase_index: order.indexOf(phase) === -1 ? order.length : order.indexOf(phase),
   };
@@ -508,6 +514,10 @@ class Session extends EventEmitter {
       exit_code: this.exitCode,
       started: this.started,
       chunks: this.chunks.length,
+      // The honest answer to "is this actually alive". The page infers whether
+      // an agent is WAITING from a quiet terminal, which is a guess; a live pid
+      // is a fact, and showing both is what keeps the guess legible as one.
+      pid: this.closed ? null : (this.proc && this.proc.pid) || null,
     };
   }
 }

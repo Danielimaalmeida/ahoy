@@ -21,6 +21,51 @@ export function shortSha(sha) {
   return typeof sha === 'string' ? sha.slice(0, 8) : '';
 }
 
+/** Just the wall clock, `11:02`. Empty string if the stamp will not parse. */
+export function clock(iso) {
+  if (typeof iso !== 'string' || !iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
+
+/** Milliseconds since an ISO stamp, or null if it is not one. */
+export function ageMs(iso) {
+  if (typeof iso !== 'string' || !iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return Math.max(Date.now() - date.getTime(), 0);
+}
+
+/**
+ * A duration as the coarsest honest phrase: `4s`, `3m`, `2h 10m`, `6d`.
+ *
+ * Coarse on purpose. A figure that changes every second re-renders on every
+ * poll and reads as motion where there is none — and past a few minutes the
+ * seconds were never the part anyone was reading.
+ */
+export function duration(ms) {
+  if (typeof ms !== 'number' || !Number.isFinite(ms) || ms < 0) return '';
+  // Floored at one second. Sub-second, `0s ago` reads as a bug rather than as
+  // the truth it is, and nothing here is precise enough for the distinction
+  // to have been worth anything.
+  const s = Math.max(Math.floor(ms / 1000), 1);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return h < 6 ? `${h}h ${m % 60}m` : `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
+/**
+ * How long ago, as a phrase: `3s ago`, `3h 41m ago`, or '' for an unusable stamp.
+ */
+export function since(iso) {
+  const ms = ageMs(iso);
+  return ms === null ? '' : `${duration(ms)} ago`;
+}
+
 /** `1 story` / `3 stories`, without the bare-number-plus-noun awkwardness. */
 export function count(n, singular, plural = `${singular}s`) {
   return `${n} ${n === 1 ? singular : plural}`;

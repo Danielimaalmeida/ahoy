@@ -24,32 +24,98 @@ export const note = (text) => el('div', { class: 'note', text });
 export const quote = (text) => el('div', { class: 'quote', text: `“${text}”` });
 
 /**
- * What a bin/ script said, verbatim.
+ * A tinted block of prose. Four kinds and only four:
  *
- * A refusal is exit 1 and it explains itself on stderr; that explanation is the
- * useful part, so it is shown in full and coloured as information rather than
- * as breakage. Shared by every panel that runs a script, so the ceiling notice
- * you get from revise.sh reads the same wherever you triggered it from.
+ *   accent  something wants your decision
+ *   warn    something is uncertain, or costs something
+ *   bad     something failed, or is disputed
+ *   halt    the filled red surface — reviewers split, and nothing else, ever
+ *
+ * The moment a second thing uses `halt`, the split stops being unmissable.
+ */
+export function callout(kind, ...body) {
+  return el('div', { class: `callout c-${kind}` }, body);
+}
+
+export const calloutTitle = (text) => el('div', { class: 'callout-title', text });
+
+/**
+ * The revision ceiling as filled and empty pips, plus the count in words.
+ *
+ * Always drawn, from revision zero — learning about a limit at the moment it
+ * bites is the worst possible time to learn it.
+ */
+export function pips(used, ceiling) {
+  const marks = [];
+  for (let i = 0; i < ceiling; i += 1) {
+    marks.push(el('span', { class: ['pip', i < used && 'on'] }));
+  }
+  return el('span', { class: 'pips', title: `${used} of ${ceiling} revision rounds used` },
+    el('span', { class: 'pip-row' }, marks),
+    el('span', { class: 'mono', text: `${used} of ${ceiling} used` }));
+}
+
+/**
+ * Terminal output, on the one dark surface in the product.
+ *
+ * It is a terminal. Dressing it as anything else makes the colours an agent
+ * emits look like a rendering bug.
+ */
+export const terminalBlock = (text, props = {}) =>
+  el('pre', { ...props, class: ['term', props.class], text });
+
+/**
+ * What a bin/ script said, verbatim. One shape, used everywhere something
+ * failed: a sentence in plain English, then the command and its exit code,
+ * then stderr on the dark surface, unabridged.
+ *
+ * The stderr is never paraphrased or silently truncated. If the sentence above
+ * it is wrong, the raw text is still there to be believed instead.
  */
 export function scriptResult(result) {
   const code = result.exit_code;
   const kind = code === 0 ? 'ok' : code === 1 ? 'warn' : 'bad';
   const heading = code === 0 ? 'Recorded.'
-                : code === 1 ? 'Refused — nothing was written.'
+                : code === 1 ? 'The harness refused. Nothing was written.'
                 : code === null ? 'The script did not finish.'
-                : 'Could not run.';
+                : 'The harness could not run this.';
 
   const output = [result.stderr, result.stdout].filter((s) => s && s.trim()).join('\n');
 
   return el('div', { class: `result ${kind}`, role: 'status' },
-    el('h2', { text: heading }),
-    el('div', { class: 'cmd', text: `$ ${result.command}   → exit ${code ?? 'none'}` }),
-    output && el('pre', { text: output }),
+    el('div', { class: 'result-head' },
+      el('h2', { text: heading }),
+      el('div', { class: 'cmd', text: `${result.command} → exit ${code ?? 'none'}` })),
+    output && terminalBlock(output),
+    output && el('div', { class: 'result-acts' }, copyButton(output, 'Copy output')),
     // bin/tick.sh is the router. Seeing it here means --no-continue was lost,
     // which in the real repository runs agents for minutes.
     /\[tick /.test(output)
       && note('That is bin/tick.sh — the server called the script without --no-continue.'),
   );
+}
+
+/**
+ * Copy to the clipboard, saying so briefly.
+ *
+ * The label reverts on its own; nothing about the page depends on the result,
+ * and a browser that refuses the clipboard says so in the label rather than
+ * throwing into a poll.
+ */
+export function copyButton(text, label = 'Copy') {
+  const button = el('button', {
+    type: 'button', class: 'small', text: label,
+    onClick: async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Could not copy';
+      }
+      setTimeout(() => { button.textContent = label; }, 1600);
+    },
+  });
+  return button;
 }
 
 /**

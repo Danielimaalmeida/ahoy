@@ -6,17 +6,34 @@
   --surface: #fff;
   --line: #e8e5e0;
   --text: #1c1b19;
-  --text-2: #5c5852;
+  --text-2: #3f3d39;
   --text-3: #8a857d;
   --accent: #2563eb;
   --accent-bg: #eff4ff;
-  --ok: #166534;
-  --ok-bg: #f0fdf4;
-  --warn: #92400e;
-  --warn-bg: #fffbeb;
-  --bad: #991b1b;
-  --bad-bg: #fef2f2;
-  --mute-bg: #f4f2ef;
+  --ok: #157f4a;
+  --ok-bg: #e8f4ec;
+  /* Warn splits in two: the mark you can see at 9px, and the text you can
+     read at 12px. One value cannot do both and stay legible. */
+  --warn: #c98a00;
+  --warn-text: #8a5a00;
+  --warn-bg: #fbf1dd;
+  --bad: #b4261a;
+  --bad-bg: #fbe9e7;
+  --mute-bg: #f0eeea;
+
+  /* Washes — a callout tinted without inventing a hue. Paler than the badge
+     backgrounds above, because these cover whole panels rather than a chip. */
+  --accent-wash: #f4f7fe;
+  --warn-wash: #fdfaf2;
+  --bad-wash: #fdf6f5;
+  --line-accent: #d7e2fb;
+  --line-warn: #e8c98a;
+  --line-bad: #f2cdc8;
+
+  /* The one non-light surface in the product. It is a terminal. */
+  --term-bg: #1c1b19;
+  --term-fg: #d8d4cc;
+
   --r: 10px;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -59,33 +76,77 @@ body {
   display: flex; justify-content: space-between; gap: 8px;
 }
 .list-group {
-  padding: 9px 15px 5px; font-size: 11px; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: 0.06em;
-  border-bottom: 1px solid var(--line); background: var(--bg);
+  padding: 11px 15px 4px; font-size: 10px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  border-top: 1px solid var(--line); background: var(--surface);
+  display: flex; justify-content: space-between; gap: 8px;
 }
+.list-group:first-child { border-top: 0; }
+.list-group.g-stopped { color: var(--warn-text); }
+
+/* Three signals per row, and they are redundant with each other on purpose:
+   which group it is in, what the third line says in words, and the colour of
+   the left edge. Losing any one of them still leaves the row legible. */
 .row {
-  display: block; width: 100%; text-align: left; font: inherit;
-  padding: 11px 15px; border: 0; border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; text-align: left; font: inherit;
+  padding: 9px 12px; border: 0; border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--line);
   background: transparent; cursor: pointer;
 }
 .row:last-child { border-bottom: 0; }
 .row:hover { background: var(--bg); }
-.row.on { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
 .row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.row.on { background: var(--accent-bg); }
+
+.row.r-waiting  { border-left-color: var(--accent); background: var(--accent-wash); }
+.row.r-running  { border-left-color: var(--ok); }
+.row.r-stopped  { border-left-color: var(--warn); background: var(--warn-wash); }
+.row.r-done .key, .row.r-done .sub { color: var(--text-3); }
+
 .key { font-family: var(--mono); font-size: 12.5px; font-weight: 600; }
-.sub { font-size: 12.5px; color: var(--text-2); margin: 2px 0 6px; }
+.sub { font-size: 12.5px; line-height: 1.35; color: var(--text-2); }
+
+/* The third line. Words, not a badge: `implementation` looks identical
+   whether a process is alive or a laptop was shut, and that ambiguity is the
+   whole reason this line exists. */
+.row-meta { font-size: 11.5px; }
+.m-waiting { color: var(--accent); }
+.m-running { color: var(--ok); }
+.m-stopped { color: var(--warn-text); }
+.m-done, .m-mute { color: var(--text-3); }
+.m-bad { color: var(--bad); }
+
+/* A directory that will not parse is a story you are not seeing. It sits in
+   the list, in the story-shaped place a story would be, rather than in a
+   toast — hiding it would be a lie of omission. */
+.row-broken {
+  padding: 9px 12px; border-top: 1px solid var(--line);
+  border-left: 3px solid var(--bad); background: var(--bad-wash);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.row-broken .key { color: var(--bad); font-family: inherit; font-size: 11.5px; }
 
 /* -------------------------------------------------------------- fragments */
 
 .badge {
-  display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px;
-  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; padding: 2px 9px; border-radius: 99px; white-space: nowrap;
 }
-.b-warn { background: var(--warn-bg); color: var(--warn); }
+.b-warn { background: var(--warn-bg); color: var(--warn-text); }
 .b-ok   { background: var(--ok-bg);   color: var(--ok); }
 .b-acc  { background: var(--accent-bg); color: var(--accent); }
 .b-bad  { background: var(--bad-bg);  color: var(--bad); }
 .b-mute { background: var(--mute-bg); color: var(--text-3); }
+
+/* Shape carries the state; colour only repeats it. A round dot means a process
+   is alive, a square means it is not, a diamond means only a human moves this.
+   All three survive a colour-blind reader and a grayscale screenshot pasted
+   into a ticket, which is where these end up. */
+.badge::before { width: 6px; height: 6px; flex: none; background: currentColor; }
+.badge.is-live::before   { content: ""; border-radius: 50%; }
+.badge.is-stopped::before { content: ""; }
+.badge.is-human::before  { content: ""; transform: rotate(45deg); }
 
 h1 { font-size: 17px; margin: 0; font-weight: 600; }
 h2 { font-size: 13px; margin: 0; font-weight: 600; }
@@ -108,7 +169,10 @@ a:hover { text-decoration: underline; }
 }
 .step { padding: 3px 9px; border-radius: 99px; background: var(--mute-bg); color: var(--text-3); }
 .step.done { background: var(--ok-bg); color: var(--ok); }
-.step.now  { background: var(--warn-bg); color: var(--warn); font-weight: 600; }
+/* Where the story actually is, filled so it reads at a glance. Not amber:
+   amber means uncertain or costly everywhere else in the page, and a story
+   sitting in its current phase is neither. */
+.step.now  { background: var(--ok); color: #fff; font-weight: 600; }
 .step.fail { background: var(--bad-bg); color: var(--bad); }
 .step.human::before { content: "\25C6\00a0"; opacity: 0.65; }
 .strip-note { font-size: 11px; color: var(--text-3); margin-bottom: 18px; }
@@ -156,19 +220,64 @@ td:last-child, th:last-child { padding-right: 0; }
 
 /* --------------------------------------------------------------- verdicts */
 
-.verdict-row.split { background: var(--warn-bg); }
-.verdict-row.split td { border-bottom-color: #f3e3c3; }
-.split-flag { color: var(--warn); font-size: 11px; white-space: nowrap; }
-.callout {
-  border: 1px solid #f0dcb4; background: var(--warn-bg); border-radius: var(--r);
-  padding: 13px 15px; margin-bottom: 14px;
+/* One row per criterion, because the criterion is the unit of agreement. Two
+   reviewer columns side by side means a split is a horizontal mismatch you can
+   see without reading a word. */
+.verdict-row.split td { background: var(--warn-wash); }
+.verdict-row.unmet td { background: var(--bad-wash); }
+.verdict-row.unmet td:first-child { box-shadow: inset 3px 0 0 var(--bad); }
+.split-flag { color: var(--warn-text); font-size: 11px; white-space: nowrap; }
+
+/* The fifth column is the point of the screen. Verdicts are inputs; the
+   consequence is what the person came for — so a met row says "nothing"
+   rather than being left blank, which reads as missing data. */
+.v-consequence { font-size: 12px; }
+.v-consequence.is-rework { color: var(--bad); font-weight: 500; }
+.v-consequence.is-none { color: var(--text-3); }
+.v-consequence .mono { display: block; color: var(--text-3); font-weight: 400; }
+.v-reviewer { display: block; }
+.v-reviewer .muted { display: block; font-size: 10.5px; text-transform: none; letter-spacing: 0; }
+
+/* A disputed criterion, lifted above everything else on the page. Two equal
+   columns, no verdict aggregated: no "1 of 2 reviewers", no majority
+   language, no ordering that puts one lens first. A split is shown as a split. */
+.dispute {
+  border: 1px solid var(--line-bad); border-radius: var(--r);
+  overflow: hidden; margin-bottom: 14px; background: var(--surface);
 }
-.callout h2 { color: var(--warn); margin-bottom: 6px; }
-.callout p { margin: 0; font-size: 12.5px; color: #6b4415; }
-.callout p + p { margin-top: 7px; }
-.callout.agreed { border-color: #f0c4c4; background: var(--bad-bg); }
-.callout.agreed h2 { color: var(--bad); }
-.callout.agreed p { color: #7a2020; }
+.dispute-head {
+  display: flex; align-items: baseline; gap: 12px; padding: 12px 16px;
+  background: var(--bad-wash); border-bottom: 1px solid var(--line-bad);
+}
+.dispute-head .ac-text { flex: 1; font-weight: 600; font-size: 13.5px; color: var(--text); }
+.dispute-tag {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.06em; color: var(--bad);
+}
+.dispute-sides { display: grid; grid-template-columns: 1fr 1fr; }
+.dispute-side { padding: 14px 16px; }
+.dispute-side + .dispute-side { border-left: 1px solid var(--line-bad); }
+.dispute-side p { margin: 0 0 8px; font-size: 13px; line-height: 1.55; color: var(--text-2); }
+.dispute-who { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.dispute-who b { font-size: 12px; color: var(--text-2); }
+.dispute-files {
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.7; color: var(--text-2);
+  background: var(--bg); border-radius: 6px; padding: 8px 10px;
+}
+@media (max-width: 860px) {
+  .dispute-sides { grid-template-columns: 1fr; }
+  .dispute-side + .dispute-side { border-left: 0; border-top: 1px solid var(--line-bad); }
+}
+
+/* The counts under the halt banner. */
+.halt-counts {
+  display: flex; flex-wrap: wrap; gap: 8px 26px;
+  padding: 10px 16px; font-size: 12.5px; color: var(--text-2);
+  background: var(--bad-wash); border: 1px solid var(--line-bad); border-top: 0;
+  border-radius: 0 0 9px 9px; margin: -14px 0 14px;
+}
+.halt-counts b { font-variant-numeric: tabular-nums; }
+.c-halt { border-radius: 9px 9px 0 0; margin-bottom: 0; }
 
 .finding { padding: 9px 0; }
 .finding + .finding { border-top: 1px solid var(--line); }
@@ -178,76 +287,200 @@ td:last-child, th:last-child { padding-right: 0; }
 
 /* --------------------------------------------------------------- decision */
 
-.decision { border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-bottom: 14px; }
+/* The only 2px border in the product. Emphasis by weight, not by fill — a
+   filled panel would read as an alert, and there is nothing wrong here. */
+.decision {
+  border: 2px solid var(--accent); border-radius: var(--r);
+  padding: 17px 19px; margin-bottom: 14px; background: var(--surface);
+}
+.decision.d-halt { border-color: var(--bad); }
+.decision.d-warn { border-color: var(--line-warn); }
+.decision .label { margin-bottom: 3px; }
+.decision h2 { font-size: 15px; }
+.decision-lede {
+  margin: 0 0 12px; font-size: 13px; color: var(--text-2); max-width: 70ch;
+}
+
+/* The ceiling, drawn from revision zero. */
+.pips { display: inline-flex; align-items: center; gap: 7px; color: var(--warn-text); }
+.pip-row { display: inline-flex; gap: 3px; }
+.pip {
+  width: 9px; height: 9px; border-radius: 2px;
+  border: 1px solid var(--warn); background: transparent;
+}
+.pip.on { background: var(--warn); }
+
+/* What sending back will actually do, between the box and the buttons so it
+   is physically in the path to the click. Not a confirm dialog: a dialog
+   arrives after the decision is made and gets dismissed by reflex. */
+.consequence {
+  margin-top: 13px; border: 1px solid var(--line-warn); background: var(--warn-wash);
+  border-radius: 9px; padding: 13px 15px;
+}
+.consequence h2 { color: var(--warn-text); margin-bottom: 8px; }
+.consequence ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.consequence li {
+  font-size: 13px; line-height: 1.5; color: var(--text-2);
+  display: flex; gap: 9px;
+}
+.consequence li::before { content: "—"; color: var(--warn); flex: none; }
+.consequence strong { color: var(--warn-text); }
 textarea {
   width: 100%; border: 1px solid var(--line); border-radius: var(--r);
   padding: 10px 12px; font: inherit; resize: vertical; background: var(--surface);
 }
 textarea:focus { outline: 2px solid var(--accent-bg); border-color: var(--accent); }
 .btns { display: flex; gap: 8px; margin-top: 11px; flex-wrap: wrap; }
+/* Four weights. Blue is navigation and identity everywhere else in the page,
+   so the two irreversible verbs take semantic colour instead — green go,
+   amber undo, red stop — and can never be mistaken for a link. */
 button {
-  font: inherit; font-size: 13px; padding: 7px 15px; border-radius: 8px;
-  border: 1px solid var(--line); background: var(--surface); cursor: pointer;
-  color: var(--text);
+  font: inherit; font-size: 13px; font-weight: 500; padding: 9px 16px;
+  border-radius: 8px; border: 1px solid var(--line); background: var(--surface);
+  cursor: pointer; color: var(--text-2);
 }
 button:hover:not(:disabled) { background: var(--bg); }
-button:disabled { opacity: 0.42; cursor: not-allowed; }
-button.primary:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-button.danger:not(:disabled) { border-color: #e5c3c3; color: var(--bad); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+button.primary:not(:disabled)  { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.approve:not(:disabled)  { background: var(--ok); border-color: var(--ok); color: #fff; font-weight: 600; }
+button.sendback:not(:disabled) { background: var(--warn-text); border-color: var(--warn-text); color: #fff; font-weight: 600; }
+button.reject:not(:disabled), button.danger:not(:disabled) {
+  background: var(--surface); border-color: var(--line-bad); color: var(--bad);
+}
+button.primary:hover:not(:disabled)  { background: #1b4fc4; }
+button.approve:hover:not(:disabled)  { background: #11633a; }
+button.sendback:hover:not(:disabled) { background: #6f4900; }
+button.reject:hover:not(:disabled)   { background: var(--bad-wash); }
+
+/* Disabled keeps its full size and its label. It is never hidden and never
+   dimmed to the point of disappearing: an unarmed button is the product
+   explaining its own rule, which is information, not clutter. */
+button:disabled {
+  background: #f7f6f4; border-color: #eae7e2; color: #a5a099; cursor: not-allowed;
+}
+button.small { font-size: 11.5px; padding: 5px 10px; }
+
 .fine { font-size: 12px; color: var(--text-3); margin-top: 10px; }
 
-.result { margin-top: 12px; border-radius: var(--r); padding: 11px 13px; font-size: 12.5px; }
-.result.ok   { background: var(--ok-bg); }
-.result.warn { background: var(--warn-bg); }
-.result.bad  { background: var(--bad-bg); }
-.result h2 { font-size: 12.5px; margin-bottom: 5px; }
-.result.ok h2 { color: var(--ok); }
-.result.warn h2 { color: var(--warn); }
-.result.bad h2 { color: var(--bad); }
-.result pre {
-  margin: 7px 0 0; font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
-  white-space: pre-wrap; word-break: break-word; color: var(--text-2);
+/* The one failure shape, used everywhere something went wrong: a sentence in
+   plain English, then the command and its exit code, then stderr verbatim on
+   the dark surface. Same order in the new-story panel, in blocked, and in the
+   detail view. Learn it once. */
+.result {
+  margin-top: 12px; border: 1px solid var(--line-bad); border-radius: 9px;
+  overflow: hidden; font-size: 12.5px;
 }
-.result .cmd { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.result-head { padding: 10px 13px; border-bottom: 1px solid var(--line-bad); background: var(--bad-wash); }
+.result h2 { font-size: 12.5px; color: var(--bad); }
+.result .cmd { font-family: var(--mono); font-size: 11px; color: var(--warn-text); margin-top: 3px; }
+.result-acts { display: flex; gap: 8px; padding: 8px 11px; background: var(--surface); }
+
+.result.ok { border-color: #cfe6d9; }
+.result.ok .result-head { background: var(--ok-bg); border-bottom-color: #cfe6d9; }
+.result.ok h2 { color: var(--ok); }
+.result.ok .cmd { color: var(--ok); }
+
+.result.warn { border-color: var(--line-warn); }
+.result.warn .result-head { background: var(--warn-wash); border-bottom-color: var(--line-warn); }
+.result.warn h2 { color: var(--warn-text); }
+
+/* Stderr is never paraphrased, never truncated silently, never turned into an
+   icon. If the sentence above it is wrong, the raw text is still here. */
+.term {
+  margin: 0; padding: 11px 14px; background: var(--term-bg); color: var(--term-fg);
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.65;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 220px; overflow: auto;
+}
+
+/* ------------------------------------------------------------- callouts */
+/* Four, and only four. */
+
+.c-accent { border: 1px solid var(--line-accent); background: var(--accent-wash); }
+.c-warn   { border: 1px solid var(--line-warn);   background: var(--warn-wash); }
+.c-bad    { border: 1px solid var(--line-bad);    background: var(--bad-wash); }
+/* The filled red surface, rationed to exactly one component: the reviewers
+   splitting. A second use and the split stops being unmissable. */
+.c-halt   { background: var(--bad); color: #fff; border: 1px solid var(--bad); }
+
+.callout {
+  border-radius: 9px; padding: 13px 16px; margin-bottom: 14px;
+  font-size: 13px; line-height: 1.55; color: var(--text-2);
+}
+.callout p { margin: 0; }
+.callout p + p { margin-top: 6px; }
+.callout-title { font-weight: 600; font-size: 13.5px; margin-bottom: 4px; color: var(--text); }
+.c-accent .callout-title { color: var(--text); }
+.c-warn .callout-title { color: var(--warn-text); }
+.c-bad .callout-title { color: var(--bad); }
+.c-halt { color: #fff; }
+.c-halt .callout-title { color: #fff; font-size: 16px; margin-bottom: 5px; }
+.c-halt p { opacity: 0.93; }
 
 /* ------------------------------------------------------------------ chat */
 
 /* The live session is the only thing on the page that is happening now, and it
-   sits above the record of everything that already has. `live` lifts it off the
-   page; `waiting` is the state that wants something from you, so it is louder. */
-.panel.live {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 1px 3px rgba(28, 27, 25, 0.06);
-}
-.panel.live .label { color: var(--text-2); }
-.panel.live.waiting {
-  border-color: #cfdcfb;
-  background: var(--accent-bg);
-}
-.panel.live.waiting .chat-log { border-color: #cfdcfb; }
+   sits above the record of everything that already has.
 
-.chat-status.waiting { color: var(--accent); font-weight: 600; }
-
-.chat-log {
-  min-height: 160px;
-  max-height: 380px;
-  margin: 0 0 10px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+   Two levels of claim, in two registers. Green: it printed recently, which is
+   a fact. Amber: it has been silent a while, which is a guess — so the panel
+   says so and shows its evidence. There is deliberately no third "it IS
+   waiting" state; we would be asserting something we cannot know. */
+.chat {
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface); overflow: hidden; margin-bottom: 14px;
 }
-.chat-form { display: flex; gap: 8px; align-items: flex-start; }
+.chat.is-quiet { border-color: var(--line-warn); box-shadow: 0 0 0 3px var(--warn-bg); }
+
+.chat-strip {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--line); background: #f7fbf8;
+}
+.chat.is-quiet .chat-strip { background: var(--warn-wash); border-bottom-color: var(--line-warn); }
+.chat.is-over .chat-strip { background: var(--bg); }
+
+.chat-mark { width: 9px; height: 9px; flex: none; margin-top: 5px; border-radius: 50%; background: var(--ok); }
+.chat.is-quiet .chat-mark { border-radius: 0; background: var(--warn); }
+.chat.is-over .chat-mark { border-radius: 0; background: var(--text-3); }
+
+.chat-claim { flex: 1; min-width: 0; }
+.chat-claim h2 { font-size: 13.5px; color: var(--ok); }
+.chat.is-quiet .chat-claim h2 { color: var(--warn-text); }
+.chat.is-over .chat-claim h2 { color: var(--text-2); }
+.chat-claim p { margin: 3px 0 0; font-size: 12.5px; color: var(--text-2); max-width: 78ch; }
+.chat-proc {
+  flex: none; text-align: right; font-family: var(--mono);
+  font-size: 11.5px; line-height: 1.5; color: var(--text-2);
+}
+.chat-proc span { color: var(--text-3); }
+
+/* A question is almost always the last non-empty line, and buried at the
+   bottom of a scrolling transcript at 11.5px it may as well not be there.
+   Lifting it out is pure presentation — no parsing, just the tail. */
+.chat-last { padding: 15px 17px; border-bottom: 1px solid var(--line); }
+.chat-last .label { margin-bottom: 7px; }
+.chat-last pre {
+  margin: 0; font-family: var(--mono); font-size: 13.5px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word; color: var(--text);
+  background: var(--bg); border-left: 3px solid var(--warn);
+  padding: 11px 14px; border-radius: 0 8px 8px 0;
+}
+
+.chat-log { max-height: 300px; min-height: 150px; border-radius: 0; }
+
+.chat-form-wrap { padding: 12px 16px; border-top: 1px solid var(--line); background: var(--surface); }
+.chat.is-quiet .chat-form-wrap { background: var(--warn-wash); border-top-color: var(--line-warn); }
+.chat-form { display: flex; gap: 10px; align-items: flex-end; }
 .chat-input {
-  flex: 1;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  padding: 9px 12px;
-  font: inherit;
-  resize: vertical;
-  background: var(--surface);
+  flex: 1; border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 12px; font: inherit; font-size: 13px; resize: vertical;
+  background: var(--bg); color: var(--text);
 }
-.chat-input:focus { outline: 2px solid var(--accent-bg); border-color: var(--accent); }
-.chat-input:disabled { background: var(--bg); color: var(--text-3); }
+.chat.is-quiet .chat-input { border-color: var(--warn); background: var(--surface); }
+.chat-input:focus { outline: 3px solid var(--accent-bg); border-color: var(--accent); }
+.chat-status { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; }
+.chat.is-quiet .chat-status { color: var(--warn-text); }
 
 /* ------------------------------------------------------------- documents */
 
@@ -271,14 +504,20 @@ details[open] summary::before { content: "\25BE\00a0"; }
    step down from the page's 14px rather than up: a plan is a document read
    inside a tool, not the headline of the screen. */
 
-.doc-views { display: flex; gap: 4px; margin: 10px 0 0; }
-.doc-view {
-  font: inherit; font-size: 11.5px; cursor: pointer;
-  padding: 3px 9px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--surface); color: var(--text-3);
+/* One segmented control, not two pills: the two are alternatives, and joining
+   them says so. The active half is the dark fill, which is the same ink the
+   terminal uses — this is the switch between reading and reading the source. */
+.doc-views {
+  display: inline-flex; margin: 10px 0 0;
+  border: 1px solid var(--line); border-radius: 7px; overflow: hidden;
 }
-.doc-view:hover { color: var(--text-2); }
-.doc-view.is-on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+.doc-view {
+  font: inherit; font-size: 11.5px; font-weight: 500; cursor: pointer;
+  padding: 6px 11px; border: 0; border-radius: 0;
+  background: var(--surface); color: var(--text-3);
+}
+.doc-view:hover:not(.is-on) { background: var(--bg); color: var(--text-2); }
+.doc-view.is-on { background: var(--text); color: #fff; }
 
 .md {
   margin: 10px 0 4px; max-height: 420px; overflow: auto;
@@ -380,3 +619,84 @@ details[open] summary::before { content: "\25BE\00a0"; }
   background: var(--accent-bg); overflow: hidden;
 }
 .cbar-fill { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+
+/* ------------------------------------------------------------ gate framing */
+
+/* Answers "why am I here" before any content, and repeats the two facts that
+   matter most: nothing expires, and nothing happens if you leave. */
+.gate-bar {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; margin-bottom: 14px;
+  border: 1px solid var(--line-accent); background: var(--accent-wash);
+  border-radius: var(--r);
+}
+.gate-bar .diamond { flex: none; color: var(--accent); margin-top: 1px; }
+.gate-bar div { flex: 1; }
+.gate-bar h2 { font-size: 13.5px; }
+.gate-bar p { margin: 3px 0 0; font-size: 12.5px; color: var(--text-2); }
+.gate-bar a { flex: none; align-self: center; }
+
+/* A rail that navigates and carries no verb. You can always reach the decision
+   in one click; you can never make it from here. A sticky Approve would be
+   exactly the nudge the harness forbids — the scroll IS the friction, and it
+   is the good kind. */
+.rail {
+  position: sticky; bottom: 0; z-index: 2;
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 20px; margin: 14px -20px -18px;
+  background: var(--surface); border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--r) var(--r);
+  box-shadow: 0 -6px 18px rgba(28, 27, 25, 0.05);
+  font-size: 12.5px; color: var(--text-2);
+}
+.rail .diamond { flex: none; color: var(--accent); }
+.rail-what { flex: 1; }
+.rail-what b { color: var(--text); }
+
+/* --------------------------------------------------- stopped, and stopped-hard */
+
+/* Stalled reads as recoverable, not as failure: nothing is wrong with the
+   work, a terminal was closed. Continue names what it will and will not redo,
+   so the click is cheap to make. */
+.stalled { border: 1px solid var(--line-warn); border-radius: var(--r); overflow: hidden; margin-bottom: 14px; }
+.stalled-head {
+  display: flex; gap: 12px; padding: 14px 17px;
+  background: var(--warn-wash); border-bottom: 1px solid var(--line-warn);
+}
+.stalled-head .chat-mark { background: var(--warn); border-radius: 0; }
+.stalled-head h2 { color: var(--warn-text); font-size: 14px; }
+.stalled-head p { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-2); max-width: 80ch; }
+.stalled-act { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 13px 17px; background: var(--surface); }
+.stalled .term { border-top: 1px solid var(--line); max-height: 110px; }
+
+/* Blocked is red and offers no Continue: retrying fails the same way until a
+   person does something outside Ahoy. Both verbs it does offer cost something,
+   so neither is styled as the obvious one. */
+.blocked { border: 1px solid var(--line-bad); border-radius: var(--r); padding: 15px 17px; margin-bottom: 14px; }
+.blocked h2 { font-size: 13.5px; margin: 8px 0 6px; }
+.blocked p { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--text-2); }
+
+/* When state.json will not parse, the page renders nothing but the error — no
+   partial phases, no last-known values, and above all no buttons. A UI that
+   offers Approve over stale state is the exact bug this codebase was built to
+   avoid. The page is allowed to say it does not know. */
+.unreadable { border: 1px solid var(--bad); border-radius: var(--r); overflow: hidden; }
+.unreadable-say { padding: 16px 18px 14px; }
+.unreadable h2 { color: var(--bad); font-size: 13.5px; margin-bottom: 6px; }
+.unreadable p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-2); }
+.unreadable .term { color: #e6b7b0; }
+.unreadable-acts { display: flex; gap: 8px; padding: 11px 18px; border-top: 1px solid var(--line); }
+
+/* Two-step, and the second step leads with what it destroys. This is the only
+   place a recorded acceptance can be undone, so it earns the extra click that
+   Send back does not. */
+.reopen { border: 1px solid var(--line-warn); border-radius: var(--r); padding: 15px 17px; margin-bottom: 14px; box-shadow: 0 0 0 3px var(--warn-bg); }
+.reopen h2 { color: var(--warn-text); font-size: 13.5px; margin-bottom: 8px; }
+.reopen p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--text-2); max-width: 62ch; }
+
+.summary-strip {
+  display: flex; flex-wrap: wrap; gap: 8px 20px;
+  padding: 11px 14px; margin-bottom: 12px;
+  background: var(--bg); border-radius: 8px; font-size: 12.5px; color: var(--text-2);
+}
+.summary-strip b { font-variant-numeric: tabular-nums; }

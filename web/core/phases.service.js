@@ -38,10 +38,48 @@ class PhasesService {
     return this.terminal.includes(phase);
   }
 
+  /**
+   * Did this story stop somewhere terminal that is NOT the successful end?
+   *
+   * `done` is named here, and it is the only phase name in this file. The
+   * table records both endings as kind `terminal` and cannot say which one
+   * went well, so the distinction has to come from somewhere — and every
+   * caller needs it, because a halt wants a person and an archive does not.
+   */
+  isHalt(phase) {
+    return this.isTerminal(phase) && phase !== 'done';
+  }
+
+  /**
+   * Which of the four groups a story belongs in.
+   *
+   * `running` is the server telling us a router process is attached. Without
+   * it, a story whose terminal was closed an hour ago and one that is working
+   * both report the same phase — which is the whole failure this fixes.
+   */
+  groupOf(story) {
+    if (story.awaiting || this.isHalt(story.phase)) return 'waiting';
+    if (this.isTerminal(story.phase)) return 'done';
+    return story.running ? 'running' : 'stopped';
+  }
+
   /** Does passing this phase land the story on a human? */
   leadsToHuman(phase) {
     const row = this.row(phase);
     return !!(row && this.humanGates[row.on_pass]);
+  }
+
+  /**
+   * The phase whose work produced the artifact this one is judging - where
+   * bin/revise.sh sends a story back to.
+   *
+   * Derived from on_pass rather than named, exactly as revise.js derives it,
+   * so a reordered table cannot leave the page promising a return to a phase
+   * the script would not choose.
+   */
+  producerOf(phase) {
+    const row = this.rows.find((r) => r.on_pass === phase);
+    return row ? row.phase : null;
   }
 
   /**

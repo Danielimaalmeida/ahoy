@@ -30,7 +30,7 @@
  */
 import { el, render } from '../core/dom.js';
 import { note, scriptResult } from '../core/ui.js';
-import { words } from '../core/format.js';
+import { words, stamp } from '../core/format.js';
 
 export function createReworkPanel({ onRework }) {
   const host = el('div');
@@ -71,47 +71,74 @@ export function createReworkPanel({ onRework }) {
     hint = el('div', { class: 'fine' });
     outcome = el('div');
 
-    render(host, el('div', { class: 'decision' },
-      el('div', { class: 'label' },
-        el('span', { text: `Rework · ${words(story.reopen.short)}` }),
-        el('span', { class: 'mono muted', text: story.reopen.key })),
-      open ? form() : opener(),
-      hint,
-      outcome,
-    ));
+    render(host, open ? form() : opener(), outcome);
 
     sync();
+  }
+
+  /** The acceptance this would clear, as approve.sh recorded it. */
+  function acceptance() {
+    return (story.state?.human_gates || {})[story.reopen.key] || null;
   }
 
   /** Step one: the story is finished, and this is the only thing on offer. */
   function opener() {
     box = null;
     submit = null;
-    return el('div', { class: 'btns' },
-      el('button', { type: 'button', text: 'Rework', disabled: busy,
-                     onClick: () => { open = true; build(); box.focus(); } }));
+    const decided = acceptance();
+
+    return el('div', { class: 'decision d-warn' },
+      el('div', { class: 'label' },
+        el('h2', { text: 'This story is delivered' }),
+        el('span', { class: 'mono muted', text: story.reopen.key })),
+      el('p', { class: 'decision-lede', text: decided && decided.timestamp
+        ? `Accepted at ${stamp(decided.timestamp)}. It is closed and nothing is running — it `
+          + 'stays here, readable, with its whole decision log.'
+        : 'It is closed and nothing is running — it stays here, readable, with its whole '
+          + 'decision log.' }),
+      el('div', { class: 'btns' },
+        el('button', { class: 'sendback', type: 'button', text: 'Reopen for rework',
+                       disabled: busy,
+                       onClick: () => { open = true; build(); box.focus(); } })),
+      hint);
   }
 
-  /** Step two: say what is wrong, then send it back. */
+  /**
+   * Step two, and it leads with what it destroys.
+   *
+   * This is the only place a recorded acceptance can be undone, so it earns
+   * the extra click that Send back does not — and the sentence people need is
+   * the one naming the specific decision about to be cleared, not a general
+   * warning they have learned to skip. The last line pre-empts the question
+   * that would otherwise send someone to a terminal to check.
+   */
   function form() {
+    const decided = acceptance();
+
     box = el('textarea', {
       rows: '3',
-      placeholder: 'What did you find? This is what the story is sent back with.',
+      placeholder: 'What did you find? Required — this is what the story is sent back with.',
       'aria-label': 'what should be reworked',
       onInput: sync,
     });
     box.value = reason;
 
-    submit = el('button', { class: 'primary', type: 'button',
-                            text: 'Send back for rework', onClick: run });
+    submit = el('button', { class: 'sendback', type: 'button',
+                            text: 'Clear the acceptance and rework', onClick: run });
 
-    return [
+    return el('div', { class: 'reopen' },
+      el('h2', { text: decided && decided.timestamp
+        ? `Reopening clears the acceptance you recorded at ${stamp(decided.timestamp)}.`
+        : 'Reopening clears the acceptance recorded at this gate.' }),
+      el('p', { text: `The story leaves ${words(story.state?.phase || 'done')}, goes back to be `
+        + `redone, and returns to this gate for a fresh decision. The pull request is not `
+        + 'reverted and Jira is not touched.' }),
       box,
       el('div', { class: 'btns' },
         submit,
         el('button', { type: 'button', text: 'Cancel', disabled: busy,
                        onClick: () => { open = false; reason = ''; build(); } })),
-    ];
+      hint);
   }
 
   /** The only place button state and the hint line are decided. */
@@ -148,12 +175,12 @@ export function createReworkPanel({ onRework }) {
            + 'Fix the ticket and start a new story.';
     }
     if (!open) {
-      return `This story is accepted and finished. Reworking it clears that acceptance `
-           + `and sends the work back to be redone.${rounds}`;
+      return `Reopening is the only way back into a delivered story, and it is bounded by the `
+           + `same ceiling as sending one back.${rounds}`;
     }
     if (hasReason) {
-      return 'The recorded acceptance is cleared — the work is about to change, so a '
-           + 'decision made about the old version cannot stand.' + rounds;
+      return 'A decision made about the old version cannot stand once the work changes, which '
+           + 'is why the acceptance goes with it.' + rounds;
     }
     return 'Nothing is sent until you say what should change.' + rounds;
   }

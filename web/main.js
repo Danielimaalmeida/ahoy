@@ -13,7 +13,7 @@ import { createDecisionPanel } from './views/decision-panel.js';
 import { createReworkPanel } from './views/rework-panel.js';
 import { createResumePanel } from './views/resume-panel.js';
 import { createChatPanel } from './views/chat-panel.js';
-import { storyDetail, detailPlaceholder } from './views/story-detail.js';
+import { storyDetail, detailPlaceholder, unreadableDetail } from './views/story-detail.js';
 import { documentState, applyDocumentState } from './views/document-panel.js';
 
 const refs = {
@@ -50,10 +50,24 @@ async function loadStories() {
   const payload = await api.stories();
   storyList.setData(payload);
 
-  const waiting = payload.stories.filter((story) => story.awaiting).length;
-  refs.status.textContent = waiting
-    ? `${waiting} ${waiting === 1 ? 'story is' : 'stories are'} waiting on a decision`
-    : 'nothing is waiting on you';
+  // The two aggregates that change what you would do next, and no others. A
+  // story that has stopped moving asks for a click; one at a gate asks for a
+  // judgement. Everything else on this page is the router's problem.
+  const counts = { waiting: 0, stopped: 0 };
+  for (const story of payload.stories) {
+    const group = phases.groupOf(story);
+    if (group === 'waiting' || group === 'stopped') counts[group] += 1;
+  }
+
+  const said = [];
+  if (counts.waiting) {
+    said.push(`${counts.waiting} ${counts.waiting === 1 ? 'story is' : 'stories are'} `
+      + 'waiting on a decision');
+  }
+  if (counts.stopped) {
+    said.push(`${counts.stopped} ${counts.stopped === 1 ? 'has' : 'have'} stopped moving`);
+  }
+  refs.status.textContent = said.length ? said.join(' · ') : 'nothing is waiting on you';
 
   return payload;
 }
@@ -73,7 +87,12 @@ async function showStory(id) {
     // Not null: null means "nothing to watch". An empty string keeps the poll
     // alive so a server that comes back brings the page back with it.
     watching = '';
-    render(refs.detail, detailPlaceholder(`Could not load ${id}: ${error.message}`));
+    // Status 0 is the transport failing — the story is probably fine and the
+    // server is not. Anything else came back FROM the server about this story,
+    // which is the case where the page must show the error and nothing else.
+    render(refs.detail, error.status === 0
+      ? detailPlaceholder(`Could not load ${id}: ${error.message}`)
+      : unreadableDetail(id, error.message));
   }
 }
 

@@ -88,7 +88,7 @@ function document_(name, label, doc) {
 
   const body = el('div', { class: 'doc-body' });
   const rendered = el('button', { class: 'doc-view is-on', type: 'button',
-                                  dataset: { view: 'rendered' }, text: 'Rendered' });
+                                  dataset: { view: 'rendered' }, text: 'Reading' });
   const source = el('button', { class: 'doc-view', type: 'button',
                                 dataset: { view: 'source' }, text: 'Source' });
 

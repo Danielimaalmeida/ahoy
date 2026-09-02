@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><style>body{margin:0;background:#e9e6e0}a{color:#2563eb}a:hover{color:#1b4fc4}</style></helmet>
+
+<div style="padding:44px 48px 28px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;max-width:1000px">
+<div style="font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#8a8680;text-transform:uppercase">Ahoy · web UI · design proposal</div>
+<h1 style="font:600 30px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin:12px 0 14px;letter-spacing:-.015em">Two decisions, made hard to make carelessly</h1>
+<p style="margin:0 0 12px;max-width:76ch;color:#3f3d39;text-wrap:pretty">Everything here evolves the existing language rather than replacing it: same 250px sidebar and fluid detail column, same tokens, same prose-first voice. No animation carries meaning, no state lives only in the browser, and no control moves a story that the harness hasn't already been asked to move.</p>
+<p style="margin:0 0 20px;max-width:76ch;color:#3f3d39;text-wrap:pretty">Margin notes sit to the right of every artboard. Anything marked <span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span> is a proposal about what the product does, not how it looks — weigh those against the harness before the pixels.</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px 10px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">
+<a href="#2a" style="padding:6px 10px;background:#f4f7fe;border:1px solid #c9d8f7;border-radius:7px;text-decoration:none">2a sidebar at scale</a>
+<a href="#a1" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">01 story list</a>
+<a href="#a2" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">02 new story</a>
+<a href="#a3" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">03 running</a>
+<a href="#a4" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">04 waiting</a>
+<a href="#a5" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">05 plan gate</a>
+<a href="#a6" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">06 send back</a>
+<a href="#a7" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">07 reviewers agree</a>
+<a href="#a8" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">08 reviewers split</a>
+<a href="#a9" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">09 delivery</a>
+<a href="#a10" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">10 stalled · blocked · refusal</a>
+<a href="#a11" style="padding:6px 10px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;text-decoration:none">11 components</a>
+</div>
+</div>
+
+<div id="2a" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 4px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#2563eb;color:#fff;border-radius:4px">2a</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">The sidebar when specs/ has grown</span></div>
+<p style="margin:0 0 14px;max-width:88ch;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;text-wrap:pretty">The list is every directory in <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">specs/</span> that has a <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">state.json</span>, and nothing ever deletes one. Same three groups at 6, 43 and 210 stories — what changes is what is allowed to take space.</p>
+
+<div style="display:flex;gap:18px;align-items:flex-start;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">6 stories · week one</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="padding:9px 12px;border-bottom:1px solid #e8e5e0;font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">specs/ · 6 stories</div>
+<div style="padding:9px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">WAITING ON YOU · 2</div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13673</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Column picker for All Facilities</div><div style="font-size:11.5px;color:#2563eb">plan review · since 09:14</div></div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #e8e5e0"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14001</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Bulk export for saved views</div><div style="font-size:11.5px;color:#b4261a">pr review · reviewers disagree</div></div>
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;border-top:1px solid #e8e5e0">RUNNING · 2</div>
+<div style="border-left:3px solid #157f4a;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13674</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Persist column order per user</div><div style="font-size:11.5px;color:#157f4a">implementation · output 3s ago</div></div>
+<div style="border-left:3px solid #157f4a;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #f0eeea"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Description column in picker</div><div style="font-size:11.5px;color:#157f4a">planning · quiet 4s</div></div>
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a5a00;border-top:1px solid #e8e5e0">STOPPED MOVING · 1</div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13990</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Retry policy for facility sync</div><div style="font-size:11.5px;color:#8a5a00">nothing running since 11:02</div></div>
+<div style="padding:12px 12px 10px;border-top:1px solid #e8e5e0"><div style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">FINISHED · 1</div><div style="font-size:12px;color:#6b6862">R3DA-13330 · yesterday</div></div>
+</div>
+</div>
+</div>
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">43 stories · month two</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="padding:8px 10px;border-bottom:1px solid #e8e5e0;display:flex;flex-direction:column;gap:7px">
+<input placeholder="Filter by key or title" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #e8e5e0;border-radius:7px;font:12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;background:#faf9f7" />
+<div style="display:flex;align-items:center;justify-content:space-between;font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862"><span>43 stories</span><span style="color:#2563eb">3 want you</span></div>
+</div>
+<div style="padding:9px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">WAITING ON YOU · 3</div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13991</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Facility sync backoff limits</div><div style="font-size:11.5px;color:#2563eb">delivery gate · 3d 4h</div></div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #e8e5e0"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13673</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Column picker for All Facilities</div><div style="font-size:11.5px;color:#2563eb">plan review · 2h</div></div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #e8e5e0"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14001</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Bulk export for saved views</div><div style="font-size:11.5px;color:#b4261a">pr review · reviewers disagree</div></div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;border-top:1px solid #e8e5e0">RUNNING · 5</div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13674</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Persist column order per user</div><div style="font-size:11.5px;color:#157f4a">output 3s ago</div></div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0eeea"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Description column in picker</div><div style="font-size:11.5px;color:#157f4a">output 11s ago</div></div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0eeea"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14045</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Saved view rename</div><div style="font-size:11.5px;color:#157f4a">output 40s ago</div></div>
+<div style="padding:7px 12px 9px;border-top:1px solid #f0eeea"><a href="#2a" style="font-size:11.5px;color:#2563eb;text-decoration:none">2 more running ↓</a></div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a5a00;border-top:1px solid #e8e5e0">STOPPED MOVING · 4</div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13990</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Retry policy for facility sync</div><div style="font-size:11.5px;color:#8a5a00">quiet 3h 41m</div></div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0e6cf"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13840</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Column width presets</div><div style="font-size:11.5px;color:#8a5a00">quiet 6d</div></div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0e6cf"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13755</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Facility list virtual scroll</div><div style="font-size:11.5px;color:#8a5a00">quiet 9d</div></div>
+<div style="padding:7px 12px 9px;border-top:1px solid #f0e6cf;background:#fdfaf2"><a href="#2a" style="font-size:11.5px;color:#8a5a00;text-decoration:none">1 more stopped ↓</a></div>
+
+<div style="padding:10px 12px;border-top:1px solid #e8e5e0;display:flex;align-items:center;justify-content:space-between"><span style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">FINISHED · 31</span><a href="#2a" style="font-size:11.5px;color:#2563eb;text-decoration:none">Show</a></div>
+</div>
+</div>
+</div>
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">210 stories · year one</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="padding:8px 10px;border-bottom:1px solid #e8e5e0;display:flex;flex-direction:column;gap:7px">
+<input value="14" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #2563eb;border-radius:7px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;background:#fff;outline:3px solid #dbe6fd" />
+<div style="display:flex;align-items:center;justify-content:space-between;font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862"><span>18 of 210 match</span><a href="#2a" style="color:#2563eb;text-decoration:none">clear</a></div>
+</div>
+
+<div style="padding:9px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">WAITING ON YOU · 2 of 6 match</div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>001</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Bulk export for saved views</div><div style="font-size:11.5px;color:#b4261a">pr review · reviewers disagree</div></div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #e8e5e0"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>077</div><div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Export column headers</div><div style="font-size:11.5px;color:#2563eb">plan review · 1d 2h</div></div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;border-top:1px solid #e8e5e0">RUNNING · 3 of 9 match</div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>022</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Description column in picker</div><div style="font-size:11.5px;color:#157f4a">output 11s ago</div></div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0eeea"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>045</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Saved view rename</div><div style="font-size:11.5px;color:#157f4a">output 40s ago</div></div>
+<div style="border-left:3px solid #157f4a;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid #f0eeea"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>102</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Facility tag filter</div><div style="font-size:11.5px;color:#157f4a">output 2m ago</div></div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a5a00;border-top:1px solid #e8e5e0">STOPPED MOVING · 1 of 12 match</div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:8px 12px 9px;display:flex;flex-direction:column;gap:2px"><div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-<mark style="background:#ffe9a8;color:#1c1b19;padding:0 1px">14</mark>060</div><div style="font-size:12px;line-height:1.3;color:#3f3d39">Export retry queue</div><div style="font-size:11.5px;color:#8a5a00">quiet 12d</div></div>
+
+<div style="padding:10px 12px;border-top:1px solid #e8e5e0;display:flex;align-items:center;justify-content:space-between"><span style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">FINISHED · 12 of 183</span><a href="#2a" style="font-size:11.5px;color:#2563eb;text-decoration:none">Show</a></div>
+<div style="padding:9px 12px 11px;border-top:1px solid #e8e5e0;background:#faf9f7"><a href="#2a" style="font-size:11.5px;color:#2563eb;text-decoration:none">All 210 stories, as a table ↗</a></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="margin-top:16px;max-width:900px;background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:16px 18px;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:10px">THE RULES THAT MAKE IT SURVIVE 200</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 26px">
+<div><b style="color:#1c1b19">Waiting on you is never capped and never collapsed.</b> It is the reason the page exists. If it ever grows past a screenful, that is a real problem and hiding it would be the wrong answer.</div>
+<div><b style="color:#1c1b19">Running and stopped cap at 3, oldest first, with an honest remainder link.</b> "2 more stopped" is a count you can act on; an infinite scroll of green rows is not.</div>
+<div><b style="color:#1c1b19">Finished collapses to a count.</b> 183 delivered stories are an archive, not a queue. It stays one click away and appears in filter results.</div>
+<div><b style="color:#1c1b19">The filter is the escape hatch, not a nav tree.</b> No epic grouping, no folders, no tabs — one field over key and title, with per-group "n of m match" so you always know what the filter is hiding.</div>
+<div><b style="color:#1c1b19">Sort within group is by the thing that matters:</b> waiting longest first, most recent output first, quietest longest first. Never alphabetical, never by directory order.</div>
+<div><b style="color:#1c1b19">Order is stable across the 3s poll.</b> A story only moves when its group changes — otherwise a running list re-sorts under the cursor every refresh.</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">WHAT YOUR DOUBT WAS RIGHT ABOUT</div><p style="margin:0;text-wrap:pretty">Grouping by state was sound; <b>giving every group the same right to space was not</b>. At 6 stories the sidebar is a list. At 200 it is three different things stacked together — a queue, a monitor, and an archive — and only the first deserves the whole column.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Nothing here is a new state or a new inference. The groups, the words and the colours are exactly artboard <a href="#a1">01</a>'s. What is added is a cap, a count, and a filter.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Finished is the one that actually grows without bound</b>, and it is the one thing on the page nobody needs to see. Collapsing it to a number reclaims most of the column at any scale.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>"2 more stopped" rather than a scroll.</b> A remainder link states its size, so a stalled backlog of 12 is visible as a fact even when only 3 are shown — the opposite of a list that quietly gets longer.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The per-group <b>"1 of 12 match"</b> line exists so a filter can never make you believe a group is empty. Filtered counts always name the total they came from.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>The table is the honest home for 210 stories.</b> The sidebar's job is the next decision; the full inventory belongs in the detail column where it can have columns and sorting.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">OPEN QUESTION</span><p style="margin:6px 0 0;text-wrap:pretty">Does anything ever remove a directory from <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">specs/</span>? If not, "finished" is permanent growth and the archive eventually wants a date grouping or a year filter. I would not build that until someone has 200 — but I would not pretend it will not happen either.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a1" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">01</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Story list — populated</span></div>
+
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;overflow:hidden;color:#1c1b19;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 12px">
+<div style="font:600 15px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Ahoy</div>
+<div style="display:flex;align-items:center;gap:14px;font-size:12.5px;color:#6b6862"><span><b style="color:#1c1b19">2 stories</b> are waiting on a decision · <b style="color:#8a5a00">1</b> has stopped moving</span><span style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099">refreshed 1s ago</span></div>
+</div>
+<div style="display:flex;gap:18px;padding:0 20px 20px;align-items:flex-start">
+
+<div style="flex:none;width:250px;display:flex;flex-direction:column;gap:12px">
+<button style="width:100%;text-align:left;padding:10px 12px;background:#fff;border:1px solid #e8e5e0;border-radius:10px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;cursor:pointer" style-hover="border-color:#2563eb;color:#2563eb">+ New story</button>
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e8e5e0"><span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">specs/ · 6 stories</span></div>
+
+<div style="padding:9px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680">WAITING ON YOU · 2</div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13673</div>
+<div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Column picker for All Facilities</div>
+<div style="font-size:11.5px;color:#2563eb">plan review · since 09:14 (2h)</div>
+</div>
+<div style="border-left:3px solid #2563eb;background:#f4f7fe;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #e8e5e0">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14001</div>
+<div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Bulk export for saved views</div>
+<div style="font-size:11.5px;color:#b4261a">pr review · reviewers disagree on 2</div>
+</div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;border-top:1px solid #e8e5e0">RUNNING · 2</div>
+<div style="border-left:3px solid #157f4a;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13674</div>
+<div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Persist column order per user</div>
+<div style="font-size:11.5px;color:#157f4a">implementation · output 3s ago</div>
+</div>
+<div style="border-left:3px solid #157f4a;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-top:1px solid #f0eeea">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</div>
+<div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Description column in picker</div>
+<div style="font-size:11.5px;color:#157f4a">planning · quiet 4s — may want you</div>
+</div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a5a00;border-top:1px solid #e8e5e0">STOPPED MOVING · 1</div>
+<div style="border-left:3px solid #c98a00;background:#fdfaf2;padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13990</div>
+<div style="font-size:12.5px;line-height:1.35;color:#3f3d39">Retry policy for facility sync</div>
+<div style="font-size:11.5px;color:#8a5a00">implementation · nothing running since 11:02</div>
+</div>
+
+<div style="padding:12px 12px 4px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;border-top:1px solid #e8e5e0">FINISHED · 1</div>
+<div style="padding:9px 12px 10px;display:flex;flex-direction:column;gap:3px;border-left:3px solid transparent">
+<div style="font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">R3DA-13330</div>
+<div style="font-size:12.5px;line-height:1.35;color:#8a8680">Configurable columns, All Facilities</div>
+<div style="font-size:11.5px;color:#8a8680">delivered yesterday 17:40</div>
+</div>
+
+<div style="border-top:1px solid #e8e5e0;background:#fdf6f5;padding:9px 12px 10px;display:flex;flex-direction:column;gap:4px">
+<div style="font:600 11.5px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#b4261a">1 directory could not be read</div>
+<div style="font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">specs/R3DA-13712/</div>
+<a href="#a10" style="font-size:11.5px;color:#b4261a">See what the harness said</a>
+</div>
+</div>
+</div>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:18px 20px">
+<div style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">WAITING ON YOU</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border:1px solid #d7e2fb;background:#f4f7fe;border-radius:9px">
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:baseline;gap:9px"><span style="font:600 13px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13673</span><span style="font-size:13px;color:#3f3d39">Column picker for All Facilities</span></div>
+<div style="font-size:12.5px;color:#3f3d39;margin-top:4px">The plan is written and wants your reading. 5 acceptance criteria, 2 repos, no revisions yet.</div>
+</div>
+<a href="#a5" style="flex:none;padding:8px 13px;background:#2563eb;color:#fff;border-radius:8px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;text-decoration:none">Read the plan</a>
+</div>
+<div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border:1px solid #f2cdc8;background:#fdf6f5;border-radius:9px">
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:baseline;gap:9px"><span style="font:600 13px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14001</span><span style="font-size:13px;color:#3f3d39">Bulk export for saved views</span></div>
+<div style="font-size:12.5px;color:#3f3d39;margin-top:4px">The two reviewers disagree about 2 of 7 criteria. The story stopped here because no one else can settle it.</div>
+</div>
+<a href="#a8" style="flex:none;padding:8px 13px;background:#b4261a;color:#fff;border-radius:8px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;text-decoration:none">Settle it</a>
+</div>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:18px 20px">
+<div style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">EVERYTHING ELSE</div>
+<div style="display:grid;grid-template-columns:120px 1fr 190px 150px;gap:0;font-size:12.5px">
+<div style="padding:0 0 8px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#a5a099">STORY</div>
+<div style="padding:0 0 8px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#a5a099">TITLE</div>
+<div style="padding:0 0 8px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#a5a099">PHASE</div>
+<div style="padding:0 0 8px;font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#a5a099">LAST MOVED</div>
+
+<div style="padding:10px 0;border-top:1px solid #f0eeea;font:600 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13674</div>
+<div style="padding:10px 12px 10px 0;border-top:1px solid #f0eeea;color:#3f3d39">Persist column order per user</div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="width:6px;height:6px;border-radius:50%;background:#157f4a"></span>implementation</span></div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea;color:#157f4a;font-size:12px">output 3s ago</div>
+
+<div style="padding:10px 0;border-top:1px solid #f0eeea;font:600 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</div>
+<div style="padding:10px 12px 10px 0;border-top:1px solid #f0eeea;color:#3f3d39">Description column in picker</div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="width:6px;height:6px;border-radius:50%;background:#157f4a"></span>planning</span></div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea;color:#6b6862;font-size:12px">quiet for 4s</div>
+
+<div style="padding:10px 0;border-top:1px solid #f0eeea;font:600 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-13990</div>
+<div style="padding:10px 12px 10px 0;border-top:1px solid #f0eeea;color:#3f3d39">Retry policy for facility sync</div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:20px;background:#fbf1dd;color:#8a5a00;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="width:6px;height:6px;background:#8a5a00"></span>implementation, not running</span></div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea;color:#8a5a00;font-size:12px">11:02 · 3h 41m ago</div>
+
+<div style="padding:10px 0;border-top:1px solid #f0eeea;font:600 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">R3DA-13330</div>
+<div style="padding:10px 12px 10px 0;border-top:1px solid #f0eeea;color:#8a8680">Configurable columns, All Facilities</div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">done</span></div>
+<div style="padding:10px 0;border-top:1px solid #f0eeea;color:#8a8680;font-size:12px">yesterday 17:40</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;align-items:baseline;gap:10px;margin:34px 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">01b</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">First run — nothing in specs/ yet</span></div>
+<div style="width:760px;background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">
+<div style="font:600 15px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin-bottom:16px">Ahoy</div>
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:34px 32px;max-width:560px">
+<div style="font:600 17px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin-bottom:8px">No stories here yet.</div>
+<p style="margin:0 0 6px;color:#3f3d39;font-size:13.5px;max-width:52ch;text-wrap:pretty">Give Ahoy the key of a Jira ticket that already exists and it will fetch it, plan the work, and stop for you to read the plan. Nothing is created in Jira.</p>
+<p style="margin:0 0 18px;color:#8a8680;font-size:12.5px">Watching <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">specs/</span> — the directory is readable and empty.</p>
+<div style="display:flex;gap:10px;align-items:center">
+<input value="R3DA-" style="width:190px;padding:9px 12px;border:1px solid #c9d8f7;border-radius:8px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;outline:2px solid #dbe6fd" />
+<button style="padding:10px 16px;background:#2563eb;color:#fff;border:0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Start</button>
+</div>
+</div>
+</div>
+</div>
+
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 1 · TRIAGE</div><p style="margin:0;text-wrap:pretty">Three signals, not one. <b>Which group</b> answers "does it want me". <b>The third line</b> answers "is it moving" in words, not a badge — <i>output 3s ago</i>, <i>nothing running since 11:02</i>. <b>Left edge colour</b> is redundant with both, so colour-blindness costs nothing.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">Stalled becomes its own group with its own words — "stopped moving" rather than a phase badge — because <i>implementation</i> looks identical whether a process is alive or the laptop was shut. This is derived from state.json's last-write time plus whether a router pid is alive; the browser still decides nothing.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>The detail pane on home is a work queue, not a dashboard.</b> Only the stories that want a decision get a card and a verb; everything else is a quiet table. There is no summary tile, no chart, no count-up — the number in the header is the only aggregate that changes behaviour.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Last moved</b> is an absolute time plus an elapsed one. Elapsed alone re-renders every poll and reads as motion where there is none.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Unreadable directory</b> sits in the list, at the bottom, in the story-shaped place a story would be — a directory that cannot be parsed is a story you are not seeing, and hiding it in a toast would be a lie of omission. It links to the verbatim script output (artboard <a href="#a10">10</a>).</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Empty state</b> puts the input in the page, not behind a button: on first run there is exactly one thing to do. It also states the one thing people get wrong — Ahoy never creates the ticket.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a2" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">02</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">New story — one box, one verb, four states</span></div>
+<div style="display:flex;gap:16px;align-items:flex-start;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">collapsed</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<button style="width:100%;text-align:left;padding:10px 12px;background:#fff;border:1px solid #e8e5e0;border-radius:10px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;cursor:pointer">+ New story</button>
+</div>
+</div>
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">open</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:13px">
+<input value="R3DA-14022" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #2563eb;border-radius:8px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;outline:3px solid #dbe6fd" />
+<div style="display:flex;gap:8px;margin-top:10px">
+<button style="flex:1;padding:9px 0;background:#2563eb;color:#fff;border:0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Start</button>
+<button style="flex:1;padding:9px 0;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Cancel</button>
+</div>
+<p style="margin:11px 0 0;font-size:12px;line-height:1.45;color:#6b6862;text-wrap:pretty">The key of a ticket that already exists. This creates the story here, never in Jira.</p>
+<p style="margin:7px 0 0;font-size:12px;line-height:1.45;color:#6b6862">Already have <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</span>? The same box picks it back up.</p>
+</div>
+</div>
+</div>
+
+<div style="flex:none;width:274px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">key not recognised</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:13px">
+<input value="r3da 14o22" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d98b82;border-radius:8px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;background:#fffbfa" />
+<div style="display:flex;gap:8px;margin-top:10px">
+<button style="flex:1;padding:9px 0;background:#f0eeea;color:#a5a099;border:0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Start</button>
+<button style="flex:1;padding:9px 0;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Cancel</button>
+</div>
+<p style="margin:11px 0 0;font-size:12px;line-height:1.45;color:#b4261a;text-wrap:pretty">That isn't the shape of a Jira key. Ahoy expects letters, a hyphen, then digits — like <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</span>. Nothing has been run.</p>
+</div>
+</div>
+</div>
+
+<div style="flex:none;width:300px">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">the script refused</div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:12px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:13px">
+<input value="R3DA-99999" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #e8e5e0;border-radius:8px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862" />
+<div style="display:flex;gap:8px;margin-top:10px">
+<button style="flex:1;padding:9px 0;background:#2563eb;color:#fff;border:0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Try again</button>
+<button style="flex:1;padding:9px 0;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Cancel</button>
+</div>
+<div style="margin-top:11px;border:1px solid #f2cdc8;border-radius:8px;overflow:hidden">
+<div style="background:#fdf6f5;padding:9px 11px;border-bottom:1px solid #f2cdc8">
+<div style="font:600 12px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#b4261a">The harness refused. No story was created.</div>
+<div style="font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a5a00;margin-top:3px">bin/run.sh R3DA-99999 → exit 4</div>
+</div>
+<pre style="margin:0;padding:9px 11px;background:#1c1b19;color:#e6e2db;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:96px;overflow:auto">jira: issue R3DA-99999 not found
+(or the token cannot see it)</pre>
+<div style="display:flex;gap:8px;padding:8px 11px;background:#fff"><button style="padding:5px 9px;background:#fff;border:1px solid #e8e5e0;border-radius:6px;font:11.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Copy output</button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">ONE BOX, ONE VERB</div><p style="margin:0;text-wrap:pretty">Start and resume stay a single field. The helper text says the resume behaviour out loud rather than adding a second control for it — a second control implies a choice the user does not have to make.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Client-side validation only says "this is not a key".</b> It never says "this ticket does not exist" — the browser cannot know that, and a UI that guesses at the harness's answer is exactly the class of bug we are avoiding. Start is unarmed, and the copy states that nothing ran.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Refusal shows three things in order:</b> what it means in a sentence, the command and exit code, then stderr verbatim in a scrolling block. Never a paraphrase of stderr — if we cannot show it faithfully we show it raw.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The refusal block replaces the panel's own body rather than appearing as a toast, so a 3-second redraw cannot destroy it and the half-typed key survives beside it.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a3" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">03</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Agent running — nothing is being asked of you</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:16px 20px 20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em">R3DA-14022</span><span style="font-size:13.5px;color:#6b6862">Description column in picker · frontend</span></div>
+<a href="#" style="font-size:12.5px;text-decoration:none">Jira ↗</a>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px">
+<span style="padding:4px 11px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">intake</span>
+<span style="padding:4px 11px;border-radius:20px;background:#157f4a;color:#fff;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">planning</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#a5a099;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ plan review</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#a5a099;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">implementation</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#a5a099;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">pr review</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#a5a099;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ delivery gate</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#a5a099;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">done</span>
+</div>
+<div style="font-size:12px;color:#8a8680;margin-bottom:16px">◆ marks the two phases only a human can move.</div>
+
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #e8e5e0;background:#f7fbf8">
+<span style="width:9px;height:9px;border-radius:50%;background:#157f4a;flex:none"></span>
+<div style="flex:1;min-width:0">
+<div style="font:600 13.5px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#157f4a">Cartographer is working</div>
+<div style="font-size:12.5px;color:#3f3d39;margin-top:2px">It printed something 2 seconds ago. Nothing is being asked of you — you can close this tab.</div>
+</div>
+<div style="font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;text-align:right;flex:none">pid 48210 · 6m 12s<br /><span style="color:#a5a099">planning</span></div>
+<button style="flex:none;padding:7px 12px;background:#fff;border:1px solid #e8e5e0;border-radius:8px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Stop the run</button>
+</div>
+<pre style="margin:0;padding:16px 18px;background:#1c1b19;color:#d8d4cc;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;height:250px;overflow:auto">  reading specs/R3DA-14022/jira-source.md
+  ticket parsed: 1 description block, 3 comments
+<span style="color:#8fb9a0">✓</span> derived 5 candidate acceptance criteria
+  mapping criteria to repositories
+    frontend        AC1 AC2 AC4 AC5
+    all-facilities  AC1 AC4 AC5
+  checking that every criterion quotes the ticket
+<span style="color:#8fb9a0">✓</span> 5 of 5 criteria carry a source quote
+  drafting work packages
+    WP1  column picker · frontend
+    WP2  description column plumbing · all-facilities
+  estimating test ids for WP1<span style="background:#d8d4cc;color:#1c1b19"> </span></pre>
+<div style="padding:12px 16px;border-top:1px solid #e8e5e0;background:#fff">
+<div style="display:flex;gap:10px;align-items:flex-end">
+<textarea placeholder="Type here if you want to interrupt — nothing is sent until you press Send." style="flex:1;height:38px;box-sizing:border-box;padding:10px 12px;border:1px solid #e8e5e0;border-radius:8px;font:13px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:none;background:#faf9f7"></textarea>
+<button style="flex:none;padding:10px 16px;background:#fff;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Send</button>
+</div>
+<div style="font-size:12px;color:#8a8680;margin-top:8px">The agent has not paused. Anything you send goes to the terminal whenever it next reads input.</div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 2 · THE LIVE CONVERSATION</div><p style="margin:0;text-wrap:pretty">The transcript stays raw and monospace — it is the truth, and dressing it as chat bubbles would invent structure the stream does not have. What changes is the <b>strip above it</b>, which is the only part that makes a claim, and states its evidence: "printed something 2 seconds ago".</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">The reply box is <b>always present and always enabled</b>. Today it is armed by the 3-second inference, which means the inference can lock you out of a terminal that really is waiting. Typing into a pty that isn't reading costs nothing; being unable to type costs the story. The inference now only changes the <i>hint</i>, never the ability.</p></div>
+<div><p style="margin:0;text-wrap:pretty">"You can close this tab" is doing real work: this user starts a story and leaves. Saying so removes the pull to sit and watch.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>pid and elapsed time</b> are the honest answer to "is this actually alive", and they are what distinguishes this screen from artboard <a href="#a10">10</a>'s stalled state.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The dark transcript is the one non-light surface in the product. It is a terminal; pretending otherwise makes the ANSI colours the agent emits look like a bug.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a4" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">04</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Agent waiting — Cartographer appears to have asked something</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:16px 20px 20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em">R3DA-14022</span><span style="font-size:13.5px;color:#6b6862">Description column in picker · frontend</span></div>
+<a href="#" style="font-size:12.5px;text-decoration:none">Jira ↗</a>
+</div>
+<div style="background:#fff;border:1px solid #e8c98a;border-radius:10px;overflow:hidden;box-shadow:0 0 0 3px #fbf1dd">
+<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #e8c98a;background:#fdfaf2">
+<span style="width:9px;height:9px;background:#c98a00;flex:none;margin-top:5px"></span>
+<div style="flex:1;min-width:0">
+<div style="font:600 13.5px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#8a5a00">Quiet for 14 seconds — it looks like it is waiting for you</div>
+<div style="font-size:12.5px;color:#3f3d39;margin-top:3px;max-width:78ch;text-wrap:pretty">Ahoy cannot see whether the agent is reading input. It has printed nothing since 11:24:06 and its last line ends in a question mark, so this is a guess — a good one, but a guess.</div>
+</div>
+<div style="font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;text-align:right;flex:none">pid 48210 · alive<br /><span style="color:#a5a099">planning</span></div>
+</div>
+<div style="padding:16px 18px;background:#fff;border-bottom:1px solid #e8e5e0">
+<div style="font:600 10px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:8px">THE LAST THING IT PRINTED</div>
+<div style="font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;background:#faf9f7;border-left:3px solid #c98a00;padding:12px 14px;border-radius:0 8px 8px 0;text-wrap:pretty">AC2 says re-ordering is "optional". Do you want it planned as a<br />work package now, or dropped from scope and left in the ticket? [order/drop]</div>
+</div>
+<pre style="margin:0;padding:16px 18px;background:#1c1b19;color:#d8d4cc;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;height:170px;overflow:auto">    WP1  column picker · frontend
+    WP2  description column plumbing · all-facilities
+  estimating test ids for WP1
+<span style="color:#8fb9a0">✓</span> WP1 → 4 test ids
+  AC2 is marked optional in the source quote
+<span style="color:#e0b878">?</span> AC2 says re-ordering is "optional". Do you want it planned as a
+  work package now, or dropped from scope and left in the ticket? [order/drop]
+<span style="background:#d8d4cc;color:#1c1b19"> </span></pre>
+<div style="padding:14px 16px;border-top:1px solid #e8e5e0;background:#fdfaf2">
+<div style="display:flex;gap:10px;align-items:flex-end">
+<textarea style="flex:1;height:66px;box-sizing:border-box;padding:11px 13px;border:1px solid #c98a00;border-radius:8px;font:13.5px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:none;background:#fff;outline:3px solid #fbf1dd">order — but put it last, behind the description column.</textarea>
+<button style="flex:none;padding:11px 18px;background:#2563eb;color:#fff;border:0;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Send</button>
+</div>
+<div style="display:flex;justify-content:space-between;gap:16px;margin-top:8px;font-size:12px;color:#8a5a00">
+<span>Sent to the terminal as typed, with a newline. Nothing is interpreted on the way.</span>
+<span style="color:#8a8680;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace">draft kept through refresh</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">HOW TO BE UNCERTAIN OUT LOUD</div><p style="margin:0;text-wrap:pretty">Three levels of claim, in three registers. <b>Green:</b> it printed recently — a fact. <b>Amber:</b> it has been silent and the last line looks like a question — stated as a guess, with the evidence attached. There is deliberately no third "it is waiting" state, because we would be asserting something we cannot know.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty"><b>Promote the last printed line.</b> A question is almost always the final non-empty line, and it is currently buried at the bottom of a scrolling <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">&lt;pre&gt;</span> at 12px. Lifting it above the transcript, unwrapped and unedited, is a pure presentation move — no parsing, no interpretation, just "here is the tail".</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">Widen the silence trigger from 3s to <b>~10s, and show a counter</b>. Three seconds fires constantly during normal work, which trains people to ignore it. A visible "quiet for 14 seconds" degrades gracefully: at 4 minutes it reads as concerning without the UI ever having to decide it is.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>No suggested replies, no order/drop buttons.</b> Parsing <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">[order/drop]</span> into two buttons would be the browser deciding what the agent accepts. The user types.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Amber surrounds the whole panel rather than one badge — this is the state where the poll must not steal focus or clear the draft, so the draft's persistence is stated on screen.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a5" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">05</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Plan review — human gate 1</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:16px 20px 0;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;height:820px;box-sizing:border-box;display:flex;flex-direction:column">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;flex:none">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em">R3DA-13673</span><span style="font-size:13.5px;color:#6b6862">Column picker for All Facilities · frontend, all-facilities</span></div>
+<a href="#" style="font-size:12.5px;text-decoration:none">Jira ↗</a>
+</div>
+<div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid #d7e2fb;background:#f4f7fe;border-radius:10px;margin-bottom:14px">
+<span style="flex:none;font:14px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#2563eb;margin-top:1px">◆</span>
+<div style="flex:1">
+<div style="font:600 13.5px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">This story is stopped at plan review and only you can move it.</div>
+<div style="font-size:12.5px;color:#3f3d39;margin-top:3px">It has been here since 09:14. There is no timeout and nothing happens if you leave — the plan is below, the decision is at the end of it.</div>
+</div>
+<a href="#a5" style="flex:none;align-self:center;padding:7px 12px;background:#fff;border:1px solid #c9d8f7;border-radius:8px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#2563eb;text-decoration:none">Jump to the decision ↓</a>
+</div>
+
+<div style="flex:1;min-height:0;overflow:auto;padding-bottom:4px;display:flex;flex-direction:column;gap:14px">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:16px 18px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+<div style="font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Acceptance criteria · 5</div>
+<div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">every criterion quotes the ticket</span></div>
+</div>
+<div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid #f0eeea">
+<div style="flex:none;width:34px;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC1</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13.5px;line-height:1.45;color:#1c1b19">Users can configure which columns they see in the All Facilities list view</div>
+<div style="margin:6px 0 0;border-left:2px solid #e8e5e0;padding-left:10px;font-size:12.5px;color:#6b6862;font-style:italic">"users can configure what columns they want to see"</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px"><span style="padding:2px 7px;border-radius:5px;background:#f0eeea;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39">frontend · opens picker, toggles visibility</span><span style="padding:2px 7px;border-radius:5px;background:#f0eeea;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39">all-facilities · show and hide columns</span></div>
+</div>
+</div>
+<div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid #f0eeea">
+<div style="flex:none;width:34px;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC2</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13.5px;line-height:1.45;color:#1c1b19">Re-ordering the columns is supported <span style="color:#8a5a00;font-size:12.5px">(the ticket calls this optional)</span></div>
+<div style="margin:6px 0 0;border-left:2px solid #e8e5e0;padding-left:10px;font-size:12.5px;color:#6b6862;font-style:italic">"re-ordering the columns could be useful for visual comparisons"</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px"><span style="padding:2px 7px;border-radius:5px;background:#f0eeea;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39">frontend · reorder by drag or menu</span></div>
+</div>
+</div>
+<div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid #f0eeea">
+<div style="flex:none;width:34px;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC3</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13.5px;line-height:1.45;color:#1c1b19">The column configuration is saved and restored across reloads</div>
+<div style="margin:6px 0 0;border-left:2px solid #e8e5e0;padding-left:10px;font-size:12.5px;color:#6b6862;font-style:italic">"saving that configuration might be useful for repeating tasks"</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px"><span style="padding:2px 7px;border-radius:5px;background:#f0eeea;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39">frontend · persists across page reloads</span></div>
+</div>
+</div>
+<div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid #f0eeea">
+<div style="flex:none;width:34px;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC4</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13.5px;line-height:1.45;color:#1c1b19">Every column available today stays selectable — none disappear from the picker</div>
+<div style="margin:6px 0 0;border-left:2px solid #e8e5e0;padding-left:10px;font-size:12.5px;color:#6b6862;font-style:italic">"none of the current columns should disappear from the available columns for selection"</div>
+</div>
+</div>
+<div style="display:flex;gap:14px;padding:11px 0 2px;border-top:1px solid #f0eeea">
+<div style="flex:none;width:34px;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC5</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13.5px;line-height:1.45;color:#1c1b19">A new Description column is added and appears in the picker</div>
+<div style="margin:6px 0 0;border-left:2px solid #e8e5e0;padding-left:10px;font-size:12.5px;color:#6b6862;font-style:italic">"new column 'Description' should be added"</div>
+</div>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #e8e5e0">
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Implementation plan</span><span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">specs/R3DA-13673/implementation-plan.md</span></div>
+<div style="display:flex;border:1px solid #e8e5e0;border-radius:7px;overflow:hidden;font:500 11.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="padding:6px 11px;background:#1c1b19;color:#fff">Reading</span><span style="padding:6px 11px;background:#fff;color:#6b6862">Source</span></div>
+</div>
+<div style="padding:16px 18px;font-size:13.5px;line-height:1.65;color:#3f3d39;max-width:74ch">
+<div style="font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;margin-bottom:6px">Approach</div>
+<p style="margin:0 0 10px;text-wrap:pretty">Column visibility becomes a user-scoped preference stored alongside the existing saved-view record, so the All Facilities grid reads one settings object instead of two. The picker is a new panel in the existing grid toolbar rather than a modal, because reordering needs the grid visible behind it.</p>
+<div style="font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;margin:14px 0 6px">Work packages</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:12px;padding:10px 12px;background:#faf9f7;border-radius:8px"><span style="flex:none;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">WP1</span><div><div style="font-size:13px;color:#1c1b19">Column picker panel and visibility toggles</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">frontend · AC1 AC2 AC4 AC5 · 4 test ids</div></div></div>
+<div style="display:flex;gap:12px;padding:10px 12px;background:#faf9f7;border-radius:8px"><span style="flex:none;font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">WP2</span><div><div style="font-size:13px;color:#1c1b19">Description column and preference persistence</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">all-facilities · AC3 AC5 · 3 test ids</div></div></div>
+</div>
+<div style="font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;margin:14px 0 6px">Out of scope</div>
+<p style="margin:0;text-wrap:pretty">Per-view column sets, and column widths. Neither is quoted in the ticket.</p>
+</div>
+</div>
+
+<div style="display:flex;gap:14px">
+<details style="flex:1;background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:12px 16px"><summary style="font:500 13px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#2563eb;cursor:pointer">Ticket source — specs/R3DA-13673/jira-source.md</summary></details>
+<div style="flex:none;width:300px;background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:12px 16px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#8a8680;margin-bottom:8px">AIU CREDITS</div>
+<div style="display:flex;justify-content:space-between;font:12px/1.9 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39"><span>intake</span><span>0.4</span></div>
+<div style="display:flex;justify-content:space-between;font:12px/1.9 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3f3d39"><span>planning</span><span>2.1</span></div>
+<div style="display:flex;justify-content:space-between;font:600 12px/1.9 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1c1b19;border-top:1px solid #f0eeea;margin-top:4px;padding-top:4px"><span>so far</span><span>2.5</span></div>
+</div>
+</div>
+
+<div style="background:#fff;border:2px solid #2563eb;border-radius:10px;padding:18px 20px">
+<div style="font:600 15px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin-bottom:4px">Your decision on this plan</div>
+<p style="margin:0 0 14px;font-size:13px;color:#3f3d39;max-width:70ch;text-wrap:pretty">Approving sends the story to implementation across <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">frontend</span> and <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">all-facilities</span>. Leaving this page changes nothing.</p>
+<textarea placeholder="A reason. Leave this empty to approve; write in it to send the plan back or reject the story." style="width:100%;box-sizing:border-box;height:74px;padding:11px 13px;border:1px solid #e8e5e0;border-radius:8px;font:13.5px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:vertical;background:#faf9f7"></textarea>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+<button style="padding:11px 20px;background:#157f4a;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Approve the plan</button>
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Send back</button>
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Reject</button>
+<span style="font-size:12.5px;color:#6b6862;margin-left:4px">Send back and Reject need a reason in the box. Revisions used: 0 of 4.</span>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:14px 18px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#8a8680;margin-bottom:10px">DECISION LOG</div>
+<div style="display:flex;gap:14px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;padding:5px 0;border-top:1px solid #f0eeea"><span style="flex:none;width:112px">08:58</span><span style="flex:none;width:110px">intake</span><span>gate passed · exit 0</span></div>
+<div style="display:flex;gap:14px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;padding:5px 0;border-top:1px solid #f0eeea"><span style="flex:none;width:112px">09:14</span><span style="flex:none;width:110px">planning</span><span>gate passed · exit 0 · handed to plan_review</span></div>
+</div>
+</div>
+
+<div style="flex:none;display:flex;align-items:center;gap:14px;padding:11px 16px;margin:0 -20px;background:#fff;border-top:1px solid #e8e5e0;box-shadow:0 -6px 18px rgba(28,27,25,.05)">
+<span style="width:8px;height:8px;background:#2563eb;flex:none;transform:rotate(45deg)"></span>
+<div style="flex:1;font-size:12.5px;color:#3f3d39"><b style="color:#1c1b19">Plan review</b> · waiting on you since 09:14 · no timeout, no default</div>
+<a href="#a5" style="padding:7px 13px;background:#fff;border:1px solid #d7dbe3;border-radius:8px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#2563eb;text-decoration:none">Go to the decision ↓</a>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 3 · DECISION UNDER A LONG PAGE</div><p style="margin:0;text-wrap:pretty">The reading order is untouched: criteria, plan, packages, credits, <i>then</i> the decision, <i>then</i> the log. What is added is a <b>sticky rail that carries no verb</b> — it states the phase and how long it has waited, and offers a scroll link. You can always reach the decision in one click; you can never make it from the rail.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">I considered a sticky Approve button and rejected it. A control that is permanently under the cursor is exactly the nudge the harness forbids — the scroll <i>is</i> the friction, and it is the good kind.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The <b>blue strip at the top</b> answers "why am I here" before any content, and repeats the two facts that matter most: nothing expires, nothing happens if you leave.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The decision panel is the only <b>2px border</b> in the product. Emphasis by weight, not by colour fill — a filled panel would read as an alert, and there is nothing wrong here.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>The box's placeholder teaches the arming rule</b> in one sentence, so the greyed Send back is explained before it is discovered. Disabled buttons stay visible rather than hidden: their existence is information.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Approve is green, not the accent blue. Blue is navigation and identity throughout; the two irreversible verbs get semantic colour so they never look like links.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a6" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">06</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Send back — reason typed, consequence stated, revision 4 of 4</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="background:#fff;border:2px solid #2563eb;border-radius:10px;padding:18px 20px;max-width:840px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+<div style="font:600 15px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Your decision on this plan</div>
+<div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#8a5a00"><span>revisions</span><span style="display:inline-flex;gap:3px"><span style="width:9px;height:9px;background:#c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#fff;border:1px solid #c98a00;border-radius:2px"></span></span><span style="font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">3 of 4 used</span></div>
+</div>
+<p style="margin:0 0 14px;font-size:13px;color:#3f3d39;max-width:70ch">You have written a reason, so Send back and Reject are armed and Approve is not.</p>
+<textarea style="width:100%;box-sizing:border-box;height:82px;padding:11px 13px;border:1px solid #2563eb;border-radius:8px;font:13.5px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:vertical;background:#fff;outline:3px solid #dbe6fd">AC3 says the configuration is saved, but the plan stores it per user rather than per saved view. Every ticket in this epic has been per view. Re-plan AC3 against the saved-view record.</textarea>
+
+<div style="margin-top:14px;border:1px solid #e8c98a;background:#fdfaf2;border-radius:9px;padding:14px 16px">
+<div style="font:600 13px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#8a5a00;margin-bottom:8px">If you send this back, three things happen</div>
+<div style="display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.5;color:#3f3d39">
+<div style="display:flex;gap:9px"><span style="flex:none;color:#c98a00">—</span><span>The approval you recorded at <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">14:22 on 29 Aug</span> is cleared. This gate becomes undecided again.</span></div>
+<div style="display:flex;gap:9px"><span style="flex:none;color:#c98a00">—</span><span>The story returns to <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">planning</span> and Cartographer re-plans with your text as its instruction.</span></div>
+<div style="display:flex;gap:9px"><span style="flex:none;color:#c98a00">—</span><span><b style="color:#8a5a00">This is the fourth and last revision.</b> After it, Send back is gone: the only ways out of this gate are approving the plan or starting the story over.</span></div>
+</div>
+</div>
+
+<div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+<button style="padding:11px 20px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Approve the plan</button>
+<button style="padding:11px 18px;background:#8a5a00;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Send back — last revision</button>
+<button style="padding:11px 18px;background:#fff;color:#b4261a;border:1px solid #f2cdc8;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Reject the story</button>
+<span style="font-size:12.5px;color:#6b6862;margin-left:4px">Clear the box to approve instead.</span>
+</div>
+</div>
+
+<div style="margin-top:18px;max-width:840px;background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:14px 18px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#8a8680;margin-bottom:10px">DECISION LOG</div>
+<div style="display:flex;gap:14px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;padding:5px 0;border-top:1px solid #f0eeea"><span style="flex:none;width:112px">29 Aug 14:22</span><span style="flex:none;width:110px;color:#157f4a">approved</span><span>plan_review · no reason given</span></div>
+<div style="display:flex;gap:14px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;padding:5px 0;border-top:1px solid #f0eeea"><span style="flex:none;width:112px">30 Aug 09:40</span><span style="flex:none;width:110px;color:#8a5a00">sent back</span><span>revision 2 · "criteria AC4 has no source quote"</span></div>
+<div style="display:flex;gap:14px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;padding:5px 0;border-top:1px solid #f0eeea"><span style="flex:none;width:112px">31 Aug 11:05</span><span style="flex:none;width:110px;color:#8a5a00">sent back</span><span>revision 3 · "split WP1, it spans two repos"</span></div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 5 · CONSEQUENCES BEFORE THE CLICK</div><p style="margin:0;text-wrap:pretty">The consequence panel appears <b>as soon as the box has text</b>, between the box and the buttons, so it is physically in the path to the click. Not a confirm dialog: a dialog arrives after the decision is made and gets dismissed by reflex.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Three consequences, in the order they will happen, each naming the specific thing affected — the approval's actual timestamp, the actual phase it returns to. "This action cannot be undone" is the kind of sentence people have learned to skip.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>The ceiling is always visible</b>, as four pips, from revision zero. Learning about a limit at the moment it bites is the worst time to learn it. At 3 of 4 the button relabels itself — <i>Send back — last revision</i> — because that is the one number that changes what you would choose.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">Send back takes amber rather than the neutral it has today, so the three verbs read as three different weights: green go, amber undo, red stop.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The <b>decision log quotes past reasons</b>. On the fourth revision the most useful thing on screen is what you already asked for three times.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The armed/unarmed pair is stated in words above the box as well as shown in the buttons — the rule is unusual enough that it should never have to be inferred from a grey fill.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a7" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">07</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">PR review — the reviewers agree three criteria are unmet</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:16px 20px 20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em">R3DA-13674</span><span style="font-size:13.5px;color:#6b6862">Persist column order per user · frontend</span></div>
+<div style="display:flex;gap:14px;font-size:12.5px"><a href="#" style="text-decoration:none">PR #4128 ↗</a><a href="#" style="text-decoration:none">Jira ↗</a></div>
+</div>
+
+<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid #e8e5e0;background:#fff;border-radius:10px;margin-bottom:14px">
+<span style="width:9px;height:9px;border-radius:50%;background:#157f4a;flex:none;margin-top:5px"></span>
+<div style="flex:1">
+<div style="font:600 14px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Nothing is being asked of you. This is running.</div>
+<div style="font-size:13px;color:#3f3d39;margin-top:3px;max-width:88ch;text-wrap:pretty">Both reviewers say the same three criteria are not met, so there is nothing to settle. The router has sent the story to <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">rework</span> on its own and a fixer is already on AC3. You will be called back at the delivery gate.</div>
+</div>
+<div style="flex:none;text-align:right;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862">rework round 1<br /><span style="color:#a5a099">started 14:07</span></div>
+</div>
+
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;overflow:hidden">
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:center;padding:11px 18px;border-bottom:1px solid #e8e5e0;font:600 10px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.08em;color:#a5a099">
+<div></div><div>CRITERION</div>
+<div style="color:#3f3d39">LOOKOUT A · design and fit<div style="font:400 10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099;letter-spacing:0;text-transform:none">sonnet · reads for intent</div></div>
+<div style="color:#3f3d39">LOOKOUT B · failure and edges<div style="font:400 10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099;letter-spacing:0;text-transform:none">opus · reads for what breaks</div></div>
+<div>WHAT HAPPENS</div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:center;padding:12px 18px;border-bottom:1px solid #f0eeea;font-size:13px">
+<div style="font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC1</div>
+<div style="padding-right:20px;color:#3f3d39">Column order persists for the signed-in user</div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span></div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span></div>
+<div style="font-size:12.5px;color:#8a8680">nothing</div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:center;padding:12px 18px;border-bottom:1px solid #f0eeea;font-size:13px">
+<div style="font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">AC2</div>
+<div style="padding-right:20px;color:#3f3d39">Order survives a logout and a new session</div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span></div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span></div>
+<div style="font-size:12.5px;color:#8a8680">nothing</div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:start;padding:13px 18px;border-bottom:1px solid #f0eeea;font-size:13px;background:#fdf6f5;border-left:3px solid #b4261a;margin-left:-0px">
+<div style="font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a">AC3</div>
+<div style="padding-right:20px;color:#1c1b19">
+<div>Re-ordering is available from the keyboard, not only by drag</div>
+<div style="margin-top:6px;font-size:12.5px;color:#6b6862;line-height:1.5;text-wrap:pretty">Both reviewers point at <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">ColumnHeader.tsx:212</span> — the handler is bound to pointer events only.</div>
+</div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div style="font-size:12.5px;color:#b4261a;font-weight:500">sent to rework<div style="font:400 11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">WP1 · in progress</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:start;padding:13px 18px;border-bottom:1px solid #f0eeea;font-size:13px;background:#fdf6f5;border-left:3px solid #b4261a">
+<div style="font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a">AC5</div>
+<div style="padding-right:20px;color:#1c1b19">Reordering fires one save, not one per column moved</div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div style="font-size:12.5px;color:#b4261a;font-weight:500">sent to rework<div style="font:400 11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">WP1 · queued</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr 208px 208px 156px;align-items:start;padding:13px 18px;font-size:13px;background:#fdf6f5;border-left:3px solid #b4261a">
+<div style="font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a">AC6</div>
+<div style="padding-right:20px;color:#1c1b19">No test covers the ordering round-trip</div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:500 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span></div>
+<div style="font-size:12.5px;color:#b4261a;font-weight:500">sent to rework<div style="font:400 11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">WP2 · queued</div></div>
+</div>
+</div>
+<div style="margin-top:10px;font-size:12.5px;color:#6b6862">The full findings from each reviewer sit below this table, unabridged. Nothing here needs a button — there is no decision to make while the reviewers agree.</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">ONE ROW PER CRITERION</div><p style="margin:0;text-wrap:pretty">The criterion is the unit of agreement, so it is the unit of layout. Two reviewer columns side by side means a split is a <b>horizontal mismatch you can see without reading</b> — that is what makes artboard <a href="#a8">08</a> work, and it only works because this table is the same table.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The fifth column, <b>"what happens"</b>, is the point of the screen. Verdicts are inputs; the consequence is what the person came for. Met rows say "nothing" rather than being left blank — a blank cell reads as missing data.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Reviewer identity carries its <b>model and its lens</b> in the header. Two verdicts only mean something if you know they were produced by different readings.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The banner opens with <b>"nothing is being asked of you"</b>. Three red rows look like a summons; they are not one. Saying so first is the difference between a person closing the tab and a person hunting for a button that does not exist.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Green is quiet: a pale chip and grey text. Red gets a fill, a left edge and a bold consequence. Attention goes to what is unmet without the met rows disappearing.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a8" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#b4261a;color:#fff;border-radius:4px">08</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">PR review — the reviewers split. This is the summons.</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:16px 20px 20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em">R3DA-14001</span><span style="font-size:13.5px;color:#6b6862">Bulk export for saved views · frontend, exports</span></div>
+<div style="display:flex;gap:14px;font-size:12.5px"><a href="#" style="text-decoration:none">PR #4131 ↗</a><a href="#" style="text-decoration:none">Jira ↗</a></div>
+</div>
+
+<div style="border:1px solid #b4261a;border-radius:10px;overflow:hidden;margin-bottom:16px">
+<div style="background:#b4261a;color:#fff;padding:15px 18px">
+<div style="font:600 16px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">The two reviewers disagree about 2 of 7 criteria. The story has stopped here.</div>
+<div style="font-size:13px;line-height:1.5;margin-top:5px;opacity:.92;max-width:96ch;text-wrap:pretty">Ahoy will not send a fixer to change something one competent reviewer already calls correct — that is a loop with no way out. Nothing moves, in either direction, until you say which reading holds.</div>
+</div>
+<div style="background:#fdf6f5;padding:11px 18px;display:flex;gap:26px;font-size:12.5px;color:#3f3d39;border-top:1px solid #f2cdc8">
+<span><b style="color:#b4261a">2</b> disputed — waiting on you</span>
+<span><b style="color:#8a5a00">1</b> agreed unmet — will go to rework once the dispute is settled</span>
+<span><b style="color:#157f4a">4</b> agreed met</span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px">
+
+<div style="background:#fff;border:1px solid #f2cdc8;border-radius:10px;overflow:hidden">
+<div style="display:flex;align-items:baseline;gap:12px;padding:13px 18px;border-bottom:1px solid #f2cdc8;background:#fdf6f5">
+<span style="font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a">AC4</span>
+<span style="flex:1;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">An export larger than 10,000 rows is refused with a message, not truncated</span>
+<span style="font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a;letter-spacing:.06em">DISPUTED</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1px 1fr">
+<div style="padding:15px 18px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span><span style="font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">Lookout A</span><span style="font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099">design and fit</span></div>
+<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#3f3d39;text-wrap:pretty">The guard exists and returns a clear message. The ticket asks for a refusal with an explanation and that is what the user gets.</p>
+<div style="font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;background:#faf9f7;border-radius:6px;padding:8px 10px">exports/src/limit.ts:44<br />frontend/src/ExportDialog.tsx:180</div>
+</div>
+<div style="background:#f2cdc8"></div>
+<div style="padding:15px 18px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span><span style="font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">Lookout B</span><span style="font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099">failure and edges</span></div>
+<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#3f3d39;text-wrap:pretty">The guard runs in the dialog, after the query has already streamed. A scheduled export skips the dialog entirely and truncates at 10,000 silently.</p>
+<div style="font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;background:#faf9f7;border-radius:6px;padding:8px 10px">exports/src/scheduled.ts:96 — no limit check</div>
+</div>
+</div>
+<div style="padding:12px 18px;border-top:1px solid #f2cdc8;background:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="font-size:12.5px;color:#6b6862">Which reading holds?</span>
+<button style="padding:7px 13px;background:#fff;border:1px solid #d7dbe3;border-radius:20px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer" style-hover="border-color:#157f4a;color:#157f4a">A is right — this is met</button>
+<button style="padding:7px 13px;background:#fbe9e7;border:1px solid #b4261a;border-radius:20px;font:600 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#b4261a;cursor:pointer">B is right — send to rework ✓</button>
+<span style="font-size:12px;color:#8a8680;margin-left:2px">Adds a line to the reason below. Nothing is submitted yet.</span>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid #f2cdc8;border-radius:10px;overflow:hidden">
+<div style="display:flex;align-items:baseline;gap:12px;padding:13px 18px;border-bottom:1px solid #f2cdc8;background:#fdf6f5">
+<span style="font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a">AC6</span>
+<span style="flex:1;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">The export keeps the column order the user configured</span>
+<span style="font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#b4261a;letter-spacing:.06em">DISPUTED</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1px 1fr">
+<div style="padding:15px 18px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span><span style="font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">Lookout A</span><span style="font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099">design and fit</span></div>
+<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#3f3d39;text-wrap:pretty">The export uses the schema order. The criterion quotes the ticket asking for "the columns as I arranged them", which this does not honour.</p>
+<div style="font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;background:#faf9f7;border-radius:6px;padding:8px 10px">exports/src/serialize.ts:31</div>
+</div>
+<div style="background:#f2cdc8"></div>
+<div style="padding:15px 18px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span><span style="font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">Lookout B</span><span style="font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5a099">failure and edges</span></div>
+<p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#3f3d39;text-wrap:pretty">Order is applied downstream in the CSV writer, so the file is correct. The serializer's order is never observable.</p>
+<div style="font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;background:#faf9f7;border-radius:6px;padding:8px 10px">exports/src/csv.ts:78 · test exports/ordering.spec.ts</div>
+</div>
+</div>
+<div style="padding:12px 18px;border-top:1px solid #f2cdc8;background:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="font-size:12.5px;color:#6b6862">Which reading holds?</span>
+<button style="padding:7px 13px;background:#fff;border:1px solid #d7dbe3;border-radius:20px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer" style-hover="border-color:#b4261a;color:#b4261a">A is right — send to rework</button>
+<button style="padding:7px 13px;background:#fff;border:1px solid #d7dbe3;border-radius:20px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer" style-hover="border-color:#157f4a;color:#157f4a">B is right — this is met</button>
+<span style="font-size:12px;color:#8a8680;margin-left:2px">Not yet answered.</span>
+</div>
+</div>
+</div>
+
+<details style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:12px 18px;margin-bottom:16px"><summary style="font:500 13px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#2563eb;cursor:pointer">The 5 criteria the reviewers agree on — 4 met, 1 unmet and bound for rework</summary></details>
+
+<div style="background:#fff;border:2px solid #b4261a;border-radius:10px;padding:18px 20px;max-width:860px">
+<div style="font:600 15px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin-bottom:4px">Settle the disagreement</div>
+<p style="margin:0 0 12px;font-size:13px;color:#3f3d39;max-width:72ch;text-wrap:pretty">One of the two criteria above is still unanswered. Your text is what the harness records and what a fixer reads — the buttons above only draft it.</p>
+<textarea style="width:100%;box-sizing:border-box;height:92px;padding:11px 13px;border:1px solid #e8e5e0;border-radius:8px;font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:vertical;background:#faf9f7">AC4 — B is right. The scheduled path is the one that matters; move the guard out of the dialog.</textarea>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Send to rework</button>
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Accept as met, move to the delivery gate</button>
+<span style="font-size:12.5px;color:#b4261a">AC6 has no answer yet — both are unarmed until every disputed criterion has one.</span>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 4 · DISAGREEMENT</div><p style="margin:0;text-wrap:pretty">This is the only screen in the product that <b>breaks its own reading order</b>. Everywhere else the evidence comes first; here the disputed criteria are lifted to the top, above the criteria table, because they are the reason you were called and everything else is context for them.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The banner is the only <b>filled red surface</b> in the whole system — reserved for exactly one thing so it can never be mistaken for a validation error. It states the halt, then the reason for the halt in the product's own voice.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Two columns, equal width, no verdict aggregated.</b> Ahoy must not imply a winner: no "1 of 2 reviewers", no majority language, no ordering that puts one lens first. The split is presented as a split.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Each reviewer shows <b>its reasoning and its file references</b>, because in nearly every real split the two are looking at different code — here, the dialog path versus the scheduled path. Seeing both file lists usually resolves it in seconds.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty"><b>Per-criterion "which reading holds" buttons.</b> They decide nothing — each one appends a line to the reason textarea, which stays fully editable. The browser is still just composing a string for the script. What they buy is the second half: <b>both submit buttons stay unarmed until every disputed criterion has an answer</b>, so a two-criterion split cannot be settled with a one-criterion sentence. If the harness cannot accept structured input here, this degrades to plain drafting and the arming rule falls away.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The agreed criteria collapse into one line. They are not hidden — they are just not why you are here.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a9" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">09</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Delivery gate, and the two states on the other side of it</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;display:flex;flex-direction:column;gap:18px">
+
+<div>
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">the gate</div>
+<div style="background:#fff;border:2px solid #2563eb;border-radius:10px;padding:18px 20px;max-width:860px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+<div style="font:600 15px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ Accept delivery</div>
+<span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">waiting since 16:31 · no timeout</span>
+</div>
+<div style="display:flex;gap:20px;margin-bottom:12px;padding:12px 14px;background:#faf9f7;border-radius:8px;font-size:12.5px;color:#3f3d39">
+<span><b style="color:#157f4a">7 of 7</b> criteria met, both reviewers</span>
+<span><b>2</b> rework rounds</span>
+<span><b>PR #4131</b> · 14 files · approved</span>
+<span><b>11.8</b> AIU across 6 phases</span>
+</div>
+<textarea placeholder="A reason. Leave this empty to accept; write in it to send the work back or reject it." style="width:100%;box-sizing:border-box;height:70px;padding:11px 13px;border:1px solid #e8e5e0;border-radius:8px;font:13.5px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;resize:vertical;background:#faf9f7"></textarea>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+<button style="padding:11px 20px;background:#157f4a;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Accept delivery</button>
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Send back</button>
+<button style="padding:11px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Reject</button>
+<span style="font-size:12.5px;color:#6b6862">Accepting records the acceptance and marks the story done. Revisions used: 1 of 4.</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:18px;align-items:flex-start">
+<div style="flex:1;min-width:0">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">after accepting — done</div>
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:16px 18px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="padding:3px 10px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">done</span><span style="font-size:13px;color:#3f3d39">Delivered by you at 16:44, 31 Aug.</span></div>
+<p style="margin:0 0 14px;font-size:13px;color:#3f3d39;max-width:64ch;text-wrap:pretty">The story is closed and nothing is running. It stays here, readable, with its whole decision log.</p>
+<button style="padding:9px 15px;background:#fff;color:#8a5a00;border:1px solid #e8c98a;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Reopen for rework</button>
+</div>
+</div>
+<div style="flex:1;min-width:0">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">reopening — the consequence, before the click</div>
+<div style="background:#fff;border:1px solid #e8c98a;border-radius:10px;padding:16px 18px;box-shadow:0 0 0 3px #fbf1dd">
+<div style="font:600 13.5px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#8a5a00;margin-bottom:8px">Reopening clears the acceptance you recorded at 16:44.</div>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#3f3d39;max-width:60ch;text-wrap:pretty">The story leaves <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">done</span>, returns to <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">rework</span>, and will come back to this gate for a fresh decision. The PR is not reverted and Jira is not touched.</p>
+<textarea placeholder="What needs reworking. Required." style="width:100%;box-sizing:border-box;height:58px;padding:10px 12px;border:1px solid #e8c98a;border-radius:8px;font:13px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;resize:none;background:#fff"></textarea>
+<div style="display:flex;gap:9px;margin-top:10px"><button style="padding:9px 15px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:600 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Clear the acceptance and rework</button><button style="padding:9px 14px;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Cancel</button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">THE SECOND GATE IS THE FIRST GATE</div><p style="margin:0;text-wrap:pretty">Same panel, same arming rule, same three verbs, same 2px border. Two gates that behave identically are two gates you only have to learn once — the only differences are the verb's noun and the summary strip.</p></div>
+<div><p style="margin:0;text-wrap:pretty">The <b>summary strip</b> is the whole story in four numbers, because by the delivery gate the page above it is very long and you have often read it yesterday. It is a recap, not a substitute — the criteria still sit above.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Only one of the three post-gate panels ever renders</b> — accept, reopen, or continue. Two would raise the question of which applies, and the harness already knows.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Reopen is a <b>two-step control</b>, and the second step leads with what it destroys. It is the only place a recorded acceptance can be undone, so it earns the extra click that Send back does not.</p></div>
+<div><p style="margin:0;text-wrap:pretty">"The PR is not reverted and Jira is not touched" pre-empts the question that would otherwise send someone to the terminal to check.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a10" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">10</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Stalled, blocked, and the harness refusing</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:20px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;display:flex;flex-direction:column;gap:18px">
+
+<div>
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">stalled — mid-phase, nothing running</div>
+<div style="background:#fff;border:1px solid #e8c98a;border-radius:10px;overflow:hidden;max-width:900px">
+<div style="display:flex;align-items:flex-start;gap:12px;padding:15px 18px;background:#fdfaf2;border-bottom:1px solid #e8c98a">
+<span style="width:9px;height:9px;background:#c98a00;flex:none;margin-top:5px"></span>
+<div style="flex:1">
+<div style="font:600 14px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#8a5a00">This story stopped moving three and a half hours ago.</div>
+<p style="margin:4px 0 0;font-size:13px;line-height:1.5;color:#3f3d39;max-width:80ch;text-wrap:pretty">It is part-way through <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">implementation</span> with no process alive — the last thing written to <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">state.json</span> was at 11:02 and the router's pid is gone. Nothing is wrong with the work; a terminal was closed. Continuing picks it up from where it stopped.</p>
+</div>
+</div>
+<div style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<button style="padding:10px 18px;background:#2563eb;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Continue from implementation</button>
+<span style="font-size:12.5px;color:#6b6862">Runs <span style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">bin/run.sh R3DA-13990</span>. WP1 is finished and stays finished; WP2 restarts.</span>
+</div>
+<pre style="margin:0;padding:13px 18px;background:#1c1b19;color:#8f8a82;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:104px;overflow:auto">  WP1 complete · 4 of 4 test ids green
+  starting WP2 · description column plumbing
+<span style="color:#a5a099">— last output, 11:02:41 —</span></pre>
+</div>
+</div>
+
+<div style="display:flex;gap:18px;align-items:flex-start">
+<div style="flex:1;min-width:0">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">blocked</div>
+<div style="background:#fff;border:1px solid #f2cdc8;border-radius:10px;padding:16px 18px">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="padding:3px 10px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">blocked</span><span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">since 09:12 · intake</span></div>
+<div style="font:600 13.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;margin-bottom:6px">The harness cannot go on without something only a person can do.</div>
+<p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:#3f3d39;text-wrap:pretty">Intake could not reach Jira: the API token has expired. Ahoy will not retry on its own — nothing here is safe to guess at.</p>
+<div style="font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6b6862;background:#faf9f7;border-radius:6px;padding:9px 11px;margin-bottom:12px">bin/intake.sh → exit 77<br />jira: 401 unauthorized</div>
+<div style="display:flex;gap:9px"><button style="padding:9px 15px;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Try intake again</button><button style="padding:9px 15px;background:#fff;color:#b4261a;border:1px solid #f2cdc8;border-radius:8px;font:500 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Abandon the story</button></div>
+</div>
+</div>
+<div style="flex:1;min-width:0">
+<div style="font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680;margin-bottom:8px">state.json will not parse — the page cannot trust itself</div>
+<div style="background:#fff;border:1px solid #b4261a;border-radius:10px;overflow:hidden">
+<div style="padding:15px 18px 13px">
+<div style="font:600 13.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#b4261a;margin-bottom:6px">Ahoy cannot read this story's state.</div>
+<p style="margin:0;font-size:13px;line-height:1.5;color:#3f3d39;text-wrap:pretty">Everything below would be a guess, so nothing is shown and no buttons are offered. The story may well be running — this page just cannot tell you about it.</p>
+</div>
+<pre style="margin:0;padding:12px 18px;background:#1c1b19;color:#e6b7b0;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:120px;overflow:auto">specs/R3DA-13712/state.json
+SyntaxError: Unexpected end of JSON input
+  at position 4181 (file is 4181 bytes)
+  last write: 11:58:03 today</pre>
+<div style="display:flex;gap:9px;padding:12px 18px;background:#fff;border-top:1px solid #f0eeea"><button style="padding:8px 13px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Copy the path</button><button style="padding:8px 13px;background:#fff;border:1px solid #e8e5e0;border-radius:7px;font:500 12.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Re-read</button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">BRIEF 6 · FAILING HONESTLY</div><p style="margin:0;text-wrap:pretty">One block shape everywhere something went wrong: <b>a sentence in plain English, then the command and its exit code, then stderr verbatim on the dark surface.</b> Same order in the new-story panel, in blocked, and here. Learn it once.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Stderr is never paraphrased, truncated silently, or turned into an icon. If the sentence above it is wrong, the raw text is still there to be believed instead.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Stalled reads as recoverable, not as failure</b> — amber, and the copy says outright that nothing is wrong with the work. Continue names what it will and will not redo, so the click is cheap to make.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Blocked is red and offers no Continue</b>, because retrying will fail the same way until a person does something outside Ahoy. The two verbs it does offer both cost something, so neither is styled as the obvious one.</p></div>
+<div><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fbf1dd;color:#8a5a00;font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em">BEHAVIOUR CHANGE</span><p style="margin:6px 0 0;text-wrap:pretty">When <span style="font:11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace">state.json</span> will not parse, the detail page renders <b>nothing but the error</b> — no partial phases, no last-known values, and above all <b>no buttons</b>. A UI that offers Approve over stale state is the exact bug class the constraints call out. The page is allowed to say it does not know.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Copy the path, not copy the error: the fix happens in a terminal, and the path is what gets pasted there.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div id="a11" style="padding:24px 48px 12px;display:flex;gap:34px;align-items:flex-start;scroll-margin-top:16px">
+<div style="flex:none;width:1180px">
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680"><span style="padding:3px 7px;background:#1c1b19;color:#fff;border-radius:4px">11</span><span style="font-size:13px;letter-spacing:0;color:#1c1b19">Components and tokens</span></div>
+<div style="background:#faf9f7;border:1px solid #e8e5e0;border-radius:12px;padding:22px;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19;display:flex;flex-direction:column;gap:22px">
+
+<div>
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">TOKENS — three added, none removed</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#faf9f7;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--bg</div><div style="color:#8a8680">#faf9f7</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#fff;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--surface</div><div style="color:#8a8680">#ffffff</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#e8e5e0;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--line</div><div style="color:#8a8680">#e8e5e0</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#1c1b19;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--text</div><div style="color:#8a8680">#1c1b19</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#2563eb;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--accent</div><div style="color:#8a8680">#2563eb</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#157f4a;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--ok</div><div style="color:#8a8680">#157f4a</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#c98a00;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--warn</div><div style="color:#8a8680">#c98a00 · text #8a5a00</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#b4261a;border-bottom:1px solid #e8e5e0"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--bad</div><div style="color:#8a8680">#b4261a</div></div></div>
+<div style="width:158px;border:1px solid #d7e2fb;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#f4f7fe;border-bottom:1px solid #d7e2fb"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#2563eb">--accent-wash <span style="color:#c98a00">new</span></div><div style="color:#8a8680">#f4f7fe</div></div></div>
+<div style="width:158px;border:1px solid #e8c98a;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#fdfaf2;border-bottom:1px solid #e8c98a"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#8a5a00">--warn-wash <span style="color:#c98a00">new</span></div><div style="color:#8a8680">#fdfaf2</div></div></div>
+<div style="width:158px;border:1px solid #f2cdc8;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#fdf6f5;border-bottom:1px solid #f2cdc8"></div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#b4261a">--bad-wash <span style="color:#c98a00">new</span></div><div style="color:#8a8680">#fdf6f5</div></div></div>
+<div style="width:158px;border:1px solid #e8e5e0;border-radius:9px;overflow:hidden;background:#fff"><div style="height:44px;background:#1c1b19;border-bottom:1px solid #e8e5e0;color:#d8d4cc;font:10px/44px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center">terminal</div><div style="padding:8px 10px;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace"><div style="color:#1c1b19">--term-fg</div><div style="color:#8a8680">#d8d4cc on --text</div></div></div>
+</div>
+</div>
+
+<div style="display:flex;gap:22px;flex-wrap:wrap">
+<div style="flex:1;min-width:420px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">PHASE AND STATE BADGES</div>
+<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">intake</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">planning</span>
+<span style="padding:4px 11px;border-radius:20px;background:#e8effc;color:#2563eb;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ plan review</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">implementation</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">pr review</span>
+<span style="padding:4px 11px;border-radius:20px;background:#f0eeea;color:#6b6862;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">rework</span>
+<span style="padding:4px 11px;border-radius:20px;background:#e8effc;color:#2563eb;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ delivery gate</span>
+<span style="padding:4px 11px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">done</span>
+<span style="padding:4px 11px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">blocked</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px">
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="width:6px;height:6px;border-radius:50%;background:#157f4a"></span>running</span>
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:#fbf1dd;color:#8a5a00;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="width:6px;height:6px;background:#8a5a00"></span>stopped moving</span>
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:#e8effc;color:#2563eb;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">◆ waiting on you</span>
+</div>
+<div style="font-size:12.5px;color:#6b6862;max-width:56ch;text-wrap:pretty">Round dot = a process is alive. Square = it is not. Diamond = only a human moves this. Shape carries the meaning; colour repeats it.</div>
+</div>
+
+<div style="flex:1;min-width:420px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">BUTTONS — four weights, and the disabled form of each</div>
+<div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:10px">
+<button style="padding:10px 18px;background:#157f4a;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Approve</button>
+<button style="padding:10px 18px;background:#8a5a00;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Send back</button>
+<button style="padding:10px 18px;background:#fff;color:#b4261a;border:1px solid #f2cdc8;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Reject</button>
+<button style="padding:10px 18px;background:#2563eb;color:#fff;border:0;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Continue</button>
+<button style="padding:10px 16px;background:#fff;color:#3f3d39;border:1px solid #e8e5e0;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;cursor:pointer">Neutral</button>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:8px">
+<button style="padding:10px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Approve</button>
+<button style="padding:10px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:600 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Send back</button>
+<button style="padding:10px 18px;background:#f7f6f4;color:#a5a099;border:1px solid #eae7e2;border-radius:8px;font:500 13.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Reject</button>
+</div>
+<div style="font-size:12.5px;color:#6b6862;max-width:56ch;text-wrap:pretty">Disabled keeps its full size and label. It is never hidden and never dimmed to the point of disappearing — an unarmed button is the product explaining its rule.</div>
+</div>
+</div>
+
+<div style="display:flex;gap:22px;flex-wrap:wrap">
+<div style="flex:1;min-width:340px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">CALLOUTS — four, and only four</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div style="border:1px solid #d7e2fb;background:#f4f7fe;border-radius:9px;padding:11px 14px;font-size:13px;color:#3f3d39"><b style="color:#1c1b19">Something wants your decision.</b> Accent wash, calm.</div>
+<div style="border:1px solid #e8c98a;background:#fdfaf2;border-radius:9px;padding:11px 14px;font-size:13px;color:#3f3d39"><b style="color:#8a5a00">Something is uncertain or costs something.</b> Silence, consequences, ceilings.</div>
+<div style="border:1px solid #f2cdc8;background:#fdf6f5;border-radius:9px;padding:11px 14px;font-size:13px;color:#3f3d39"><b style="color:#b4261a">Something failed or is disputed.</b> Bordered, not filled.</div>
+<div style="background:#b4261a;border-radius:9px;padding:11px 14px;font-size:13px;color:#fff"><b>The halt.</b> Filled red, used in exactly one place: reviewers split.</div>
+</div>
+</div>
+<div style="flex:1;min-width:340px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">SCRIPT RESULT — the one failure shape</div>
+<div style="border:1px solid #f2cdc8;border-radius:9px;overflow:hidden">
+<div style="background:#fdf6f5;padding:10px 13px;border-bottom:1px solid #f2cdc8"><div style="font:600 12.5px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#b4261a">What it means, in a sentence.</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a5a00">bin/&lt;script&gt;.sh &lt;args&gt; → exit N</div></div>
+<pre style="margin:0;padding:10px 13px;background:#1c1b19;color:#e6e2db;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap">stderr, verbatim, scrollable, never paraphrased</pre>
+<div style="display:flex;gap:8px;padding:9px 13px;background:#fff"><button style="padding:5px 9px;background:#fff;border:1px solid #e8e5e0;border-radius:6px;font:11.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Copy output</button><button style="padding:5px 9px;background:#fff;border:1px solid #e8e5e0;border-radius:6px;font:11.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39;cursor:pointer">Try again</button></div>
+</div>
+</div>
+<div style="flex:1;min-width:300px">
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">MARKDOWN / SOURCE TOGGLE · VERDICTS · CEILING</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="display:flex;border:1px solid #e8e5e0;border-radius:7px;overflow:hidden;font:500 11.5px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><span style="padding:6px 11px;background:#1c1b19;color:#fff">Reading</span><span style="padding:6px 11px;background:#fff;color:#6b6862">Source</span></div><span style="font-size:12px;color:#8a8680">state survives the 3s redraw</span></div>
+<div style="display:flex;gap:7px;margin-bottom:12px"><span style="padding:3px 9px;border-radius:20px;background:#e8f4ec;color:#157f4a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">met</span><span style="padding:3px 9px;border-radius:20px;background:#fbe9e7;color:#b4261a;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not met</span><span style="padding:3px 9px;border-radius:20px;background:#f0eeea;color:#6b6862;font:600 11.5px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">not reviewed</span></div>
+<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#8a5a00"><span style="display:inline-flex;gap:3px"><span style="width:9px;height:9px;background:#c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#fff;border:1px solid #c98a00;border-radius:2px"></span><span style="width:9px;height:9px;background:#fff;border:1px solid #c98a00;border-radius:2px"></span></span><span style="font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace">2 of 4 revisions used</span></div>
+</div>
+</div>
+
+<div>
+<div style="font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;letter-spacing:.1em;color:#8a8680;margin-bottom:12px">TYPE — two faces, six sizes</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:baseline">
+<div><div style="font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace">R3DA-14022</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">mono 20 / 600 · story key</div></div>
+<div><div style="font:600 16px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Panel and halt headings</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">sans 15–16 / 600</div></div>
+<div><div style="font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Prose and criteria — full sentences</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">sans 13.5–14 / 400</div></div>
+<div><div style="font:12.5px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#6b6862">Secondary, timestamps, hints</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">sans 12–12.5 · --text at 60%</div></div>
+<div><div style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace">phases · paths · exit codes</div><div style="font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a8680">mono 11–12</div></div>
+</div>
+</div>
+</div>
+</div>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;width:320px;position:sticky;top:16px;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#3f3d39">
+<div style="border-left:2px solid #cfcbc4;padding:2px 0 2px 16px;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#8a8680;margin-bottom:6px">WHAT THE SYSTEM ADDS</div><p style="margin:0;text-wrap:pretty">Three wash tokens, so a callout can be tinted without a new hue, and a terminal foreground. Everything else is what is already in the stylesheet. All of it is flat colour, borders and radius — nothing here needs a gradient, a shadow beyond one soft rail, or a single line of animation.</p></div>
+<div><p style="margin:0;text-wrap:pretty"><b>Shape carries state, colour repeats it.</b> Dot / square / diamond survive a colour-blind reader and a grayscale screenshot pasted into a ticket.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Filled red is <b>rationed to one component</b>. The moment a second thing uses it, the split stops being unmissable.</p></div>
+<div><p style="margin:0;text-wrap:pretty">Everything on this sheet is hand-writable CSS with no build step: flat fills, 1px borders, 8–10px radius, two system faces.</p></div>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div style="padding:30px 48px 70px;max-width:1000px;font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#1c1b19">
+<div style="background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:26px 30px">
+<div style="font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#8a8680;margin-bottom:10px">WHERE I DISAGREE WITH THE BRIEF</div>
+<div style="display:flex;flex-direction:column;gap:16px;max-width:82ch">
+<div><b>The 3-second idle inference should not gate the input.</b> The brief calls this the weakest moment in the product, and I think the weakness is not the inference's accuracy — it is that a wrong inference takes away the keyboard. Let the guess change the words and never the capability, and the problem stops being a correctness problem.</div>
+<div><b>"Stalled" should not be a phase badge with a modifier.</b> The brief lists it as a state the UI must express; I would give it its own group and its own vocabulary in the list, because the whole failure of today's sidebar is that <i>implementation</i> means two different things. Cost: one more group heading in a 250px column.</div>
+<div><b>I would not add a sticky Approve, and I'd resist it if it comes up.</b> "Hard to reach" and "hard to make carelessly" are the same property here. A sticky rail that only navigates gets the reachability without the nudge.</div>
+<div><b>The per-criterion buttons on the disagreement screen are the one place I have gone past restyling.</b> They compose text rather than deciding anything, so they respect the constraint — but the arming rule that comes with them (every disputed criterion needs an answer) is new behaviour and needs the harness's blessing. Without it, the screen still works; it just cannot stop a one-line answer to a two-criterion split.</div>
+<div><b>Everything on artboard 10's unparseable case is a refusal to render.</b> That will feel like a regression the first time someone hits it, and it is the correct behaviour. Worth agreeing on before it ships.</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Canvas&quot;},&quot;showChangeFlags&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Canvas&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props || {};
+    return {
+      showNotes: p.showNotes ?? true,
+      showFlags: p.showChangeFlags ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>
